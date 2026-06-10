@@ -419,27 +419,6 @@ export default function Home() {
                       </ol>
                     </div>
 
-                    <button
-                      data-testid="btn-add-channel-cta"
-                      onClick={() => setHasChannel(true)}
-                      className="w-full rounded-2xl p-4 flex items-center gap-3 text-left transition-colors hover:bg-white/[0.07] active:bg-white/[0.10]"
-                      style={{
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.07)",
-                      }}
-                    >
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: "rgba(255,255,255,0.1)" }}
-                      >
-                        <span className="text-lg">📢</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-[15px] text-white">Добавить свой канал</div>
-                        <div className="text-[12px] text-white/45">Монетизируй контент через Trends</div>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-white/30 shrink-0" />
-                    </button>
                   </div>
                 )}
               </div>
