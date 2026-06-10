@@ -58,12 +58,12 @@ const TabBar = ({
   active: string;
   setActive: (t: string) => void;
 }) => (
-  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 100%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)" }}>
+  <div className="flex items-center rounded-2xl p-[3px] w-full" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 100%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)" }}>
     {tabs.map((tab) => (
       <button
         key={tab}
         onClick={() => setActive(tab)}
-        className={`flex-1 text-center py-[7px] text-[13px] font-semibold rounded-full transition-all duration-200 ${
+        className={`flex-1 text-center py-[7px] text-[13px] font-semibold rounded-xl transition-all duration-200 ${
           active === tab
             ? "bg-white text-black shadow-sm"
             : "text-white/55 hover:text-white/80"
