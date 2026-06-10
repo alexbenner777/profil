@@ -396,9 +396,9 @@ export default function Home() {
                     <div
                       className="rounded-2xl p-8 flex flex-col items-center text-center"
                       style={{
-                        background: "rgba(255,255,255,0.05)",
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.05) 100%)",
                         border: "1px solid rgba(255,255,255,0.07)",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
                       }}
                     >
                       <div className="text-4xl mb-4">📡</div>
