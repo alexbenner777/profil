@@ -58,7 +58,7 @@ const TabBar = ({
   active: string;
   setActive: (t: string) => void;
 }) => (
-  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
+  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)" }}>
     {tabs.map((tab) => (
       <button
         key={tab}
@@ -144,6 +144,7 @@ export default function Home() {
                 padding: "8px 14px 8px 8px",
                 gap: 10,
                 minHeight: 62,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
               }}
             >
               <TrendsLogo />
@@ -170,6 +171,7 @@ export default function Home() {
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
               }}
             >
               <Settings style={{ width: 20, height: 20, color: "rgba(255,255,255,0.55)" }} />
@@ -391,6 +393,7 @@ export default function Home() {
                       style={{
                         background: "rgba(255,255,255,0.05)",
                         border: "1px solid rgba(255,255,255,0.07)",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
                       }}
                     >
                       <div className="text-4xl mb-4">📡</div>
