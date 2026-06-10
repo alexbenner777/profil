@@ -404,7 +404,7 @@ export default function Home() {
                               boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.9)",
                             }}
                           >
-                            <Star className="w-3.5 h-3.5" style={{ color: "#f59e0b", fill: "#f59e0b" }} />
+                            <img src={`${import.meta.env.BASE_URL}star.png`} alt="star" style={{ width: 16, height: 16, objectFit: "contain" }} />
                             Пополнить
                           </button>
                         </div>
