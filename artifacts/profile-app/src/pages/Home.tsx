@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logoImg from "@assets/logo_trends_1781102455128.png";
 import {
   ChevronLeft,
   ChevronDown,
@@ -19,13 +20,24 @@ import {
 } from "lucide-react";
 
 const TrendsLogo = () => (
-  <div className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)" }}>
-    <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Left chevron */}
-      <path d="M2 2L9 10L2 18" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
-      {/* Right chevron */}
-      <path d="M11 2L18 10L11 18" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+  <div
+    style={{
+      width: 46,
+      height: 46,
+      borderRadius: 14,
+      background: "rgba(255,255,255,0.12)",
+      border: "1.5px solid rgba(255,255,255,0.22)",
+      backdropFilter: "blur(12px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <img
+      src={logoImg}
+      alt="Trends"
+      style={{ width: 30, height: 30, objectFit: "contain", mixBlendMode: "screen" }}
+    />
   </div>
 );
 
@@ -106,27 +118,42 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Balance row */}
-          <div className="flex items-center justify-between">
+          {/* Balance row — single unified card */}
+          <div
+            className="flex items-center"
+            style={{
+              background: "rgba(255,255,255,0.09)",
+              border: "1px solid rgba(255,255,255,0.13)",
+              borderRadius: 18,
+              backdropFilter: "blur(12px)",
+              padding: "8px 10px 8px 10px",
+              gap: 10,
+            }}
+          >
             <TrendsLogo />
-            <div className="flex items-center gap-2">
-              <div
-                className="flex items-center gap-3 px-4 py-2 rounded-2xl"
-                style={{ background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.08)" }}
-              >
-                <div className="flex flex-col items-end">
-                  <span className="text-[11px] text-white/50 leading-none mb-0.5">Баланс TRND</span>
-                  <span className="text-[22px] font-bold leading-none text-white">40</span>
-                </div>
-              </div>
-              <button
-                data-testid="btn-settings"
-                className="w-10 h-10 rounded-xl flex items-center justify-center active:opacity-60 transition-opacity"
-                style={{ background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.08)" }}
-              >
-                <Settings className="w-5 h-5 text-white/60" />
-              </button>
+            <div className="flex-1" />
+            <div className="flex flex-col items-end mr-2">
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1, marginBottom: 3 }}>
+                Баланс TRND
+              </span>
+              <span style={{ fontSize: 24, fontWeight: 800, lineHeight: 1, color: "#fff" }}>40</span>
             </div>
+            <button
+              data-testid="btn-settings"
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.09)",
+                border: "1px solid rgba(255,255,255,0.10)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Settings className="w-[18px] h-[18px]" style={{ color: "rgba(255,255,255,0.55)" }} />
+            </button>
           </div>
         </div>
 
