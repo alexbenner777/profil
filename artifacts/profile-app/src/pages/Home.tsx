@@ -410,11 +410,6 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Tip row */}
-                      <div className="flex items-start gap-2 text-[12px] text-white/40 leading-snug">
-                        <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-[#f59e0b]" />
-                        <span>Купи Stars → они станут TRND → выбери видео → установи награду</span>
-                      </div>
                     </div>
                   </div>
                 ) : (
