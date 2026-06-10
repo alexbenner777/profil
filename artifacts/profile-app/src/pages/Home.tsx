@@ -307,8 +307,10 @@ export default function Home() {
                     <div
                       className="rounded-2xl p-4 space-y-4"
                       style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.07) 100%)",
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        backdropFilter: "blur(12px)",
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)",
                       }}
                     >
                       {/* Title + approved badge */}
@@ -322,13 +324,25 @@ export default function Home() {
 
                       {/* Action buttons */}
                       <div className="flex gap-2">
-                        <button className="flex-1 flex items-center justify-center gap-2 bg-white text-black font-semibold py-2.5 rounded-xl text-[13px] active:scale-[0.98] transition-transform">
+                        <button
+                          className="flex-1 flex items-center justify-center gap-2 font-semibold py-2.5 rounded-xl text-[13px] active:scale-[0.98] transition-transform text-black"
+                          style={{
+                            background: "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(235,235,235,1) 100%)",
+                            boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.9)",
+                          }}
+                        >
                           <Globe className="w-4 h-4" />
                           Страница Trends
                         </button>
                         <button
                           className="flex-1 flex items-center justify-center gap-2 font-semibold py-2.5 rounded-xl text-[13px] active:scale-[0.98] transition-transform"
-                          style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" }}
+                          style={{
+                            background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
+                            border: "1px solid rgba(255,255,255,0.14)",
+                            backdropFilter: "blur(12px)",
+                            boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                            color: "rgba(255,255,255,0.85)",
+                          }}
                         >
                           <Pencil className="w-4 h-4" />
                           Редактировать
@@ -347,7 +361,12 @@ export default function Home() {
                           <div
                             key={s.label}
                             className="flex flex-col items-center py-2.5 rounded-xl"
-                            style={{ background: "rgba(255,255,255,0.06)" }}
+                            style={{
+                              background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
+                              border: "1px solid rgba(255,255,255,0.14)",
+                              backdropFilter: "blur(12px)",
+                              boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                            }}
                           >
                             <span className="text-[17px] font-bold text-white leading-none mb-1">{s.value}</span>
                             <span className="text-[9px] text-white/45 text-center leading-tight">{s.label}</span>
@@ -358,7 +377,12 @@ export default function Home() {
                       {/* Rewards block */}
                       <div
                         className="rounded-xl p-3.5"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                        style={{
+                          background: "linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.07) 100%)",
+                          border: "1px solid rgba(255,255,255,0.14)",
+                          backdropFilter: "blur(12px)",
+                          boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                        }}
                       >
                         <div className="text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1.5">
                           НАГРАДЫ ПОДПИСЧИКАМ
