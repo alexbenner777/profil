@@ -118,41 +118,48 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Balance row — single unified card */}
-          <div
-            className="flex items-center"
-            style={{
-              background: "rgba(255,255,255,0.09)",
-              border: "1px solid rgba(255,255,255,0.13)",
-              borderRadius: 18,
-              backdropFilter: "blur(12px)",
-              padding: "8px 10px 8px 10px",
-              gap: 10,
-            }}
-          >
-            <TrendsLogo />
-            <div className="flex-1" />
-            <div className="flex flex-col items-end mr-2">
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1, marginBottom: 3 }}>
-                Баланс TRND
-              </span>
-              <span style={{ fontSize: 24, fontWeight: 800, lineHeight: 1, color: "#fff" }}>40</span>
+          {/* Balance row — logo+balance card  +  separate gear button */}
+          <div className="flex items-center gap-2">
+            {/* Wide card: logo + balance */}
+            <div
+              className="flex items-center flex-1"
+              style={{
+                background: "rgba(255,255,255,0.09)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                borderRadius: 18,
+                backdropFilter: "blur(12px)",
+                padding: "8px 14px 8px 8px",
+                gap: 10,
+                minHeight: 62,
+              }}
+            >
+              <TrendsLogo />
+              <div className="flex-1" />
+              <div className="flex flex-col items-end">
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1, marginBottom: 4 }}>
+                  Баланс TRND
+                </span>
+                <span style={{ fontSize: 26, fontWeight: 800, lineHeight: 1, color: "#fff" }}>40</span>
+              </div>
             </div>
+
+            {/* Gear button — separate square */}
             <button
               data-testid="btn-settings"
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 12,
+                width: 62,
+                height: 62,
+                borderRadius: 18,
                 background: "rgba(255,255,255,0.09)",
-                border: "1px solid rgba(255,255,255,0.10)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                backdropFilter: "blur(12px)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <Settings className="w-[18px] h-[18px]" style={{ color: "rgba(255,255,255,0.55)" }} />
+              <Settings style={{ width: 20, height: 20, color: "rgba(255,255,255,0.55)" }} />
             </button>
           </div>
         </div>
