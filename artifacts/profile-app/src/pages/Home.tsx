@@ -1,403 +1,703 @@
-import React, { useState } from "react";
-import { 
-  ChevronLeft, 
-  ChevronDown, 
-  MoreHorizontal, 
-  Settings, 
-  Calendar, 
-  Medal, 
-  Plus, 
-  Satellite, 
-  Megaphone, 
-  ExternalLink, 
-  Copy, 
-  Share, 
+import { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronDown,
+  MoreHorizontal,
+  Settings,
+  Calendar,
+  Plus,
+  ExternalLink,
+  Copy,
+  Share2,
   User,
   Eye,
-  Zap
+  Zap,
+  Globe,
+  Pencil,
+  Star,
+  Lightbulb,
 } from "lucide-react";
 
-// T-shape Hexagon logo
-const LogoIcon = () => (
-  <div className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round" className="text-white">
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 17l10 5 10-5" />
-      <path d="M2 12l10 5 10-5" />
+const TrendsLogo = () => (
+  <div className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)" }}>
+    <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Left chevron */}
+      <path d="M2 2L9 10L2 18" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Right chevron */}
+      <path d="M11 2L18 10L11 18" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   </div>
 );
 
-const TokenIcon = () => (
-  <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-    <span className="text-white font-bold text-xs">T</span>
+const TokenBadge = () => (
+  <div className="w-7 h-7 rounded-full bg-[#f59e0b] flex items-center justify-center shadow-lg">
+    <span className="text-white font-black text-[13px] leading-none">T</span>
   </div>
 );
 
 type TabType = "Каналы" | "Токены" | "Магазин" | "Задания";
 type SubTabTokens = "Активность" | "Друзья" | "Бейджи";
 type SubTabShop = "Бонусы" | "Партнеры" | "Розыгрыш" | "Boost";
+type SubTabChannel = "Опубликовано" | "На проверке";
+
+const TabBar = ({
+  tabs,
+  active,
+  setActive,
+}: {
+  tabs: string[];
+  active: string;
+  setActive: (t: string) => void;
+}) => (
+  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+    {tabs.map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActive(tab)}
+        className={`flex-1 text-center py-[7px] text-[13px] font-semibold rounded-full transition-all duration-200 ${
+          active === tab
+            ? "bg-white text-black shadow-sm"
+            : "text-white/55 hover:text-white/80"
+        }`}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+);
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("Каналы");
   const [tokensSubTab, setTokensSubTab] = useState<SubTabTokens>("Активность");
   const [shopSubTab, setShopSubTab] = useState<SubTabShop>("Бонусы");
+  const [channelSubTab, setChannelSubTab] = useState<SubTabChannel>("Опубликовано");
+  const [hasChannel, setHasChannel] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0f18] text-white flex justify-center w-full">
-      <div className="w-full max-w-md gradient-bg min-h-[100dvh] relative overflow-hidden flex flex-col shadow-2xl">
-        
+    <div
+      className="min-h-[100dvh] w-full flex justify-center"
+      style={{ background: "#0c1523" }}
+    >
+      <div
+        className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(ellipse 120% 60% at 50% 0%, #1e3a6e 0%, #111e35 45%, #0c1523 100%)",
+        }}
+      >
         {/* Sticky Header */}
-        <div className="sticky top-0 z-50 pt-4 px-4 pb-2 bg-gradient-to-b from-[#162040] to-transparent">
-          {/* Row 1 */}
+        <div className="sticky top-0 z-50 px-4 pt-4 pb-3" style={{ background: "transparent" }}>
+          {/* Nav row */}
           <div className="flex items-center justify-between mb-4">
-            <button className="flex items-center text-blue-400 font-medium text-[17px]">
-              <ChevronLeft className="w-6 h-6 mr-1" />
+            <button
+              data-testid="btn-back"
+              className="flex items-center text-[#4d9ff8] font-medium text-[17px] active:opacity-70 transition-opacity"
+            >
+              <ChevronLeft className="w-5 h-5 mr-0.5" strokeWidth={2.5} />
               Назад
             </button>
-            <div className="flex items-center space-x-4 text-white">
-              <button><ChevronDown className="w-6 h-6" /></button>
-              <button><MoreHorizontal className="w-6 h-6" /></button>
+            <div className="flex items-center space-x-4 text-white/80">
+              <button data-testid="btn-chevron-down" className="active:opacity-60 transition-opacity">
+                <ChevronDown className="w-6 h-6" />
+              </button>
+              <button data-testid="btn-more" className="active:opacity-60 transition-opacity">
+                <MoreHorizontal className="w-6 h-6" />
+              </button>
             </div>
           </div>
-          
-          {/* Row 2 */}
+
+          {/* Balance row */}
           <div className="flex items-center justify-between">
-            <LogoIcon />
-            <div className="flex items-center glass-panel rounded-full px-3 py-1.5">
-              <span className="text-xs text-white/70 mr-2">Баланс TRND</span>
-              <span className="font-bold text-[15px] mr-3">40</span>
-              <Settings className="w-4 h-4 text-white/70" />
+            <TrendsLogo />
+            <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-3 px-4 py-2 rounded-2xl"
+                style={{ background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <div className="flex flex-col items-end">
+                  <span className="text-[11px] text-white/50 leading-none mb-0.5">Баланс TRND</span>
+                  <span className="text-[22px] font-bold leading-none text-white">40</span>
+                </div>
+              </div>
+              <button
+                data-testid="btn-settings"
+                className="w-10 h-10 rounded-xl flex items-center justify-center active:opacity-60 transition-opacity"
+                style={{ background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <Settings className="w-5 h-5 text-white/60" />
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
-          
-          {/* Profile Section */}
-          <div className="px-4 mt-2 mb-6 flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold tracking-tight">Миша Зевс</h1>
-                <div className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-                  <Medal className="w-3 h-3 text-gray-300" />
-                  <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">SILVER</span>
-                </div>
-              </div>
-              <div className="text-white/60 text-[15px] mb-2">@misha_zeus</div>
-              <div className="flex items-center text-white/40 text-[13px]">
-                <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                с 10 июня 2026 г.
-              </div>
-            </div>
-            
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 p-[2px]">
-              <div className="w-full h-full rounded-full bg-[#1a2235] border-2 border-[#162040] flex items-center justify-center overflow-hidden">
-                <User className="w-8 h-8 text-white/20" />
-              </div>
-            </div>
-          </div>
-
-          {/* Main Tab Bar */}
-          <div className="px-4 mb-6">
-            <div className="flex items-center glass-panel rounded-full p-1 w-full justify-between">
-              {(["Каналы", "Токены", "Магазин", "Задания"] as TabType[]).map((tab) => (
+        {/* Sticky bottom bar — only when channel exists on Каналы tab */}
+        {activeTab === "Каналы" && hasChannel && (
+          <div
+            className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-2"
+            style={{
+              background: "linear-gradient(to top, rgba(12,21,35,0.98) 60%, transparent)",
+              zIndex: 40,
+            }}
+          >
+            <button
+              className="w-full bg-white text-black font-bold py-4 rounded-2xl text-[16px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-xl"
+            >
+              <Plus className="w-5 h-5" />
+              Добавить видео в ленту
+            </button>
+            <div
+              className="flex items-center mt-2 rounded-2xl p-1"
+              style={{ background: "rgba(255,255,255,0.07)" }}
+            >
+              {(["Опубликовано", "На проверке"] as SubTabChannel[]).map((t) => (
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 text-center py-2 text-[14px] font-medium rounded-full transition-all duration-200 ${
-                    activeTab === tab 
-                      ? "bg-white text-black shadow-sm" 
-                      : "text-white/60 hover:text-white"
+                  key={t}
+                  onClick={() => setChannelSubTab(t)}
+                  className={`flex-1 py-2.5 text-[14px] font-semibold rounded-xl transition-all duration-200 ${
+                    channelSubTab === t
+                      ? "bg-white text-black shadow-sm"
+                      : "text-white/50 hover:text-white/80"
                   }`}
                 >
-                  {tab}
+                  {t}
                 </button>
               ))}
             </div>
           </div>
+        )}
 
-          {/* Tab Content */}
-          <div className="px-4">
-            
-            {/* Каналы (Channels) */}
-            {activeTab === "Каналы" && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <button className="w-16 h-16 rounded-full border border-dashed border-white/30 flex items-center justify-center hover:bg-white/5 transition-colors">
-                      <Plus className="w-6 h-6 text-white/60" />
-                    </button>
-                    <span className="text-[11px] text-white/60 w-16 text-center leading-tight">Добавить канал</span>
-                  </div>
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {/* Profile section */}
+          <div className="px-4 mt-1 mb-5 flex justify-between items-start">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h1 className="text-[22px] font-bold tracking-tight text-white">Миша Зевс</h1>
+                <div
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full"
+                  style={{ border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.06)" }}
+                >
+                  <span className="text-[10px]">🥈</span>
+                  <span className="text-[10px] font-bold text-white/70 tracking-wider">SILVER</span>
                 </div>
-
-                <div className="glass-card rounded-2xl p-8 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                    <Satellite className="w-8 h-8 text-white/80" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">Нет добавленных каналов</h3>
-                  <p className="text-[14px] text-white/60 leading-relaxed max-w-[280px]">
-                    Добавь свой Telegram-канал, чтобы видео появились в ленте Trends
-                  </p>
-                </div>
-
-                <div className="space-y-3 px-2">
-                  <h4 className="text-[13px] font-bold text-white/40 uppercase tracking-wider">Как это работает</h4>
-                  <ol className="space-y-3">
-                    <li className="flex gap-3 text-[14px] text-white/80">
-                      <span className="text-white/40 font-mono">1.</span>
-                      Нажми «Добавить свой канал» ниже
-                    </li>
-                    <li className="flex gap-3 text-[14px] text-white/80">
-                      <span className="text-white/40 font-mono">2.</span>
-                      Следуй инструкциям в боте <span className="text-blue-400">@ContentifyAI_Bot</span>
-                    </li>
-                    <li className="flex gap-3 text-[14px] text-white/80">
-                      <span className="text-white/40 font-mono">3.</span>
-                      Добавь бота как администратора в канал
-                    </li>
-                    <li className="flex gap-3 text-[14px] text-white/80">
-                      <span className="text-white/40 font-mono">4.</span>
-                      После одобрения видео появятся в ленте
-                    </li>
-                  </ol>
-                </div>
-
-                <button className="w-full glass-card rounded-2xl p-4 flex items-center gap-4 hover:bg-white/[0.06] transition-colors text-left group">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                    <Megaphone className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-[15px] mb-0.5">Добавить свой канал</div>
-                    <div className="text-[12px] text-white/50">Монетизируй контент через Trends</div>
-                  </div>
-                  <ExternalLink className="w-5 h-5 text-white/30 group-hover:text-white/60 transition-colors" />
-                </button>
               </div>
-            )}
+              <div className="text-white/55 text-[14px] mb-2">@misha_zeus</div>
+              <div className="flex items-center text-white/40 text-[13px] gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                с 10 июня 2026 г.
+              </div>
+            </div>
+            <div
+              className="w-[60px] h-[60px] rounded-full p-[2px]"
+              style={{ background: "linear-gradient(135deg, #4d9ff8, #7c5ce8)" }}
+            >
+              <div
+                className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+                style={{ background: "#1a2540" }}
+              >
+                <User className="w-7 h-7 text-white/20" />
+              </div>
+            </div>
+          </div>
 
-            {/* Токены (Tokens) */}
-            {activeTab === "Токены" && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex flex-col items-center py-6 text-center">
-                  <div className="flex items-center gap-2 justify-center mb-1">
-                    <span className="text-6xl font-black tracking-tight">40</span>
-                    <TokenIcon />
-                  </div>
-                  <div className="text-[15px] font-bold mb-4">TRND</div>
-                  <p className="text-[14px] text-white/50 max-w-[280px]">
-                    Trends начисляет TRND за просмотры, стрики и приглашения друзей
-                  </p>
-                </div>
+          {/* Main tab bar */}
+          <div className="px-4 mb-5">
+            <TabBar
+              tabs={["Каналы", "Токены", "Магазин", "Задания"]}
+              active={activeTab}
+              setActive={(t) => setActiveTab(t as TabType)}
+            />
+          </div>
 
-                <div className="glass-card rounded-2xl p-5">
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <div className="font-bold text-[16px] mb-1">Пригласить друга</div>
-                      <div className="text-[#FBBF24] text-[13px] font-medium">+13000 Т вам и другу</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
-                      <User className="w-4 h-4 text-white/70" />
-                      <span className="font-bold">0</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 bg-black/20 rounded-xl p-3 mb-4 border border-white/5">
-                    <div className="flex-1 text-[13px] text-white/60 font-mono truncate">
-                      t.me/ContentifyAI_Bot?startapp=ref_288113313
-                    </div>
-                    <button className="p-1.5 text-white/60 hover:text-white transition-colors">
-                      <Copy className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <button className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
-                    <Share className="w-4 h-4" />
-                    Поделиться ссылкой
-                  </button>
-                </div>
+          {/* Tab content — extra bottom padding when channel sticky bar is shown */}
+          <div className={`px-4 ${activeTab === "Каналы" && hasChannel ? "pb-[130px]" : "pb-10"}`}>
 
-                <div className="flex items-center glass-panel rounded-full p-1 w-full mt-8">
-                  {(["Активность", "Друзья", "Бейджи"] as SubTabTokens[]).map((tab) => (
+            {/* ── Каналы ── */}
+            {activeTab === "Каналы" && (
+              <div className="animate-in fade-in duration-200">
+                {/* Channel avatars row */}
+                <div className="flex gap-4 mb-5">
+                  {hasChannel && (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <button
+                        onClick={() => {}}
+                        className="w-[56px] h-[56px] rounded-full flex items-center justify-center font-bold text-white text-[18px]"
+                        style={{
+                          background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                          boxShadow: "0 0 0 2.5px #7c3aed, 0 0 0 4px rgba(124,58,237,0.3)",
+                        }}
+                      >
+                        МО
+                      </button>
+                      <span className="text-[11px] text-white/60 leading-tight text-center">Мой канал</span>
+                    </div>
+                  )}
+                  <div className="flex flex-col items-center gap-1.5">
                     <button
-                      key={tab}
-                      onClick={() => setTokensSubTab(tab)}
-                      className={`flex-1 text-center py-2 text-[13px] font-medium rounded-full transition-all duration-200 ${
-                        tokensSubTab === tab 
-                          ? "bg-white/20 text-white" 
-                          : "text-white/50 hover:text-white/80"
-                      }`}
+                      data-testid="btn-add-channel"
+                      onClick={() => setHasChannel(true)}
+                      className="w-[56px] h-[56px] rounded-full flex items-center justify-center transition-colors hover:bg-white/5"
+                      style={{ border: "1.5px dashed rgba(255,255,255,0.25)" }}
                     >
-                      {tab}
+                      <Plus className="w-5 h-5 text-white/50" />
                     </button>
-                  ))}
+                    <span className="text-[11px] text-white/50 w-[60px] text-center leading-tight">
+                      {hasChannel ? "Ещё канал" : "Добавить канал"}
+                    </span>
+                  </div>
                 </div>
 
-                {tokensSubTab === "Активность" && (
-                  <div className="pt-2 pb-6">
-                    <h4 className="text-[13px] font-bold text-white/40 uppercase tracking-wider mb-4 px-2">КАК ЗАРАБАТЫВАТЬ</h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                            <Eye className="w-5 h-5 text-white/80" />
-                          </div>
-                          <div>
-                            <div className="font-bold text-[14px]">Просмотр видео</div>
-                            <div className="text-[12px] text-white/50">25–100 Coins / видео, до 100 видео/день</div>
-                          </div>
+                {hasChannel ? (
+                  /* ── Channel detail card ── */
+                  <div className="space-y-0 pb-28">
+                    <div
+                      className="rounded-2xl p-4 space-y-4"
+                      style={{
+                        background: "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      {/* Title + approved badge */}
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[17px] text-white">Мой канал</span>
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.15)" }}>
+                          <span className="text-[10px] text-green-400">✓</span>
+                          <span className="text-[11px] font-semibold text-green-400">Одобрен</span>
                         </div>
-                        <div className="text-[13px] font-bold text-white/80">25–100 С</div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                            <Zap className="w-5 h-5 text-white/80" />
-                          </div>
-                          <div>
-                            <div className="font-bold text-[14px]">Ежедневный чекин</div>
-                            <div className="text-[12px] text-white/50">50–500 Coins, 30-дневный цикл</div>
-                          </div>
-                        </div>
-                        <div className="text-[13px] font-bold text-white/80">50–500 С</div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                            <User className="w-5 h-5 text-white/80" />
+                      {/* Action buttons */}
+                      <div className="flex gap-2">
+                        <button className="flex-1 flex items-center justify-center gap-2 bg-white text-black font-semibold py-2.5 rounded-xl text-[13px] active:scale-[0.98] transition-transform">
+                          <Globe className="w-4 h-4" />
+                          Страница Trends
+                        </button>
+                        <button
+                          className="flex-1 flex items-center justify-center gap-2 font-semibold py-2.5 rounded-xl text-[13px] active:scale-[0.98] transition-transform"
+                          style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Редактировать
+                        </button>
+                      </div>
+
+                      {/* Stats row */}
+                      <div className="grid grid-cols-5 gap-1">
+                        {[
+                          { label: "Видео", value: "0" },
+                          { label: "Просмотры", value: "0" },
+                          { label: "Лайки", value: "0" },
+                          { label: "Переходов", value: "0" },
+                          { label: "Подписок", value: "0" },
+                        ].map((s) => (
+                          <div
+                            key={s.label}
+                            className="flex flex-col items-center py-2.5 rounded-xl"
+                            style={{ background: "rgba(255,255,255,0.06)" }}
+                          >
+                            <span className="text-[17px] font-bold text-white leading-none mb-1">{s.value}</span>
+                            <span className="text-[9px] text-white/45 text-center leading-tight">{s.label}</span>
                           </div>
-                          <div>
-                            <div className="font-bold text-[14px]">Приглашение друга</div>
-                            <div className="text-[12px] text-[#FBBF24]">+13000 coins</div>
-                          </div>
+                        ))}
+                      </div>
+
+                      {/* Rewards block */}
+                      <div
+                        className="rounded-xl p-3.5"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                      >
+                        <div className="text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1.5">
+                          НАГРАДЫ ПОДПИСЧИКАМ
                         </div>
-                        <div className="text-[13px] font-bold text-white/80">1000+ С</div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-[20px] font-black text-white leading-none">0</span>
+                              <span className="text-[13px] font-bold text-white/60">TRND</span>
+                            </div>
+                            <div className="text-[11px] text-white/35 mt-0.5 max-w-[160px] leading-snug">
+                              Пополни баланс чтобы начать назначать награды
+                            </div>
+                          </div>
+                          <button
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-[13px] text-white shrink-0"
+                            style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.35)" }}
+                          >
+                            <Star className="w-3.5 h-3.5 text-[#f59e0b]" />
+                            Пополнить
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Tip row */}
+                      <div className="flex items-start gap-2 text-[12px] text-white/40 leading-snug">
+                        <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-[#f59e0b]" />
+                        <span>Купи Stars → они станут TRND → выбери видео → установи награду</span>
                       </div>
                     </div>
+                  </div>
+                ) : (
+                  /* ── Empty state ── */
+                  <div className="space-y-5">
+                    <div
+                      className="rounded-2xl p-8 flex flex-col items-center text-center"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                      }}
+                    >
+                      <div className="text-4xl mb-4">📡</div>
+                      <h3 className="text-[16px] font-bold text-white mb-2">Нет добавленных каналов</h3>
+                      <p className="text-[13px] text-white/50 leading-relaxed max-w-[240px]">
+                        Добавь свой Telegram-канал, чтобы видео появились в ленте Trends
+                      </p>
+                    </div>
+
+                    <div className="px-1 space-y-2.5">
+                      <h4 className="text-[12px] font-semibold text-white/40 uppercase tracking-wider">
+                        Как это работает
+                      </h4>
+                      <ol className="space-y-2.5">
+                        {[
+                          "Нажми «Добавить свой канал» ниже",
+                          <>Следуй инструкциям в боте <span className="text-[#4d9ff8]">@ContentifyAI_Bot</span></>,
+                          "Добавь бота как администратора в канал",
+                          "После одобрения видео появятся в ленте",
+                        ].map((step, i) => (
+                          <li key={i} className="flex gap-3 text-[14px] text-white/75">
+                            <span className="text-white/35 font-mono shrink-0">{i + 1}.</span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    <button
+                      data-testid="btn-add-channel-cta"
+                      onClick={() => setHasChannel(true)}
+                      className="w-full rounded-2xl p-4 flex items-center gap-3 text-left transition-colors hover:bg-white/[0.07] active:bg-white/[0.10]"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                      }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: "rgba(255,255,255,0.1)" }}
+                      >
+                        <span className="text-lg">📢</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-[15px] text-white">Добавить свой канал</div>
+                        <div className="text-[12px] text-white/45">Монетизируй контент через Trends</div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-white/30 shrink-0" />
+                    </button>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Магазин (Shop) */}
-            {activeTab === "Магазин" && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center bg-white/5 rounded-full p-1 w-full overflow-x-auto hide-scrollbar">
-                  {(["Бонусы", "Партнеры", "Розыгрыш", "Boost"] as SubTabShop[]).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setShopSubTab(tab)}
-                      className={`flex-none px-5 py-2 text-[14px] font-medium rounded-full transition-all duration-200 ${
-                        shopSubTab === tab 
-                          ? "bg-white text-black shadow-sm" 
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
+            {/* ── Токены ── */}
+            {activeTab === "Токены" && (
+              <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Balance display */}
+                <div className="flex flex-col items-center py-5 text-center">
+                  <div className="flex items-center gap-2.5 justify-center mb-1">
+                    <span className="text-[58px] font-black tracking-tight leading-none text-white">40</span>
+                    <TokenBadge />
+                  </div>
+                  <div className="text-[15px] font-bold text-white mb-3">TRND</div>
+                  <p className="text-[13px] text-white/45 max-w-[260px] leading-relaxed">
+                    Trends начисляет TRND за просмотры, стрики и приглашения друзей
+                  </p>
                 </div>
 
-                <div className="glass-card rounded-3xl p-8 flex flex-col items-center justify-center min-h-[300px] text-center mt-4">
-                  <div className="w-16 h-16 mb-4 relative">
-                    <div className="absolute inset-0 bg-white/20 rounded-full animate-ping opacity-20"></div>
-                    <div className="w-full h-full bg-white/10 rounded-full flex items-center justify-center relative">
-                      <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin"></div>
+                {/* Referral card */}
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <div className="font-bold text-[15px] text-white mb-0.5">Пригласить друга</div>
+                      <div className="text-[13px] font-medium" style={{ color: "#f59e0b" }}>
+                        +13000 Т вам и другу
+                      </div>
+                    </div>
+                    <div
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                      style={{ background: "rgba(255,255,255,0.08)" }}
+                    >
+                      <User className="w-4 h-4 text-white/60" />
+                      <span className="font-bold text-white text-[14px]">0</span>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Офферы загружаются</h3>
-                  <p className="text-[14px] text-white/50 leading-relaxed max-w-[280px]">
+
+                  <div
+                    className="flex items-center gap-2 rounded-xl p-3 mb-3"
+                    style={{
+                      background: "rgba(0,0,0,0.25)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    <div className="flex-1 text-[12px] text-white/50 font-mono truncate">
+                      t.me/ContentifyAI_Bot?startapp=ref_288113313
+                    </div>
+                    <button
+                      data-testid="btn-copy-link"
+                      className="p-1 text-white/50 hover:text-white/80 transition-colors active:scale-90"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button
+                      data-testid="btn-share-link-icon"
+                      className="p-1 text-white/50 hover:text-white/80 transition-colors active:scale-90"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <button
+                    data-testid="btn-share-link"
+                    className="w-full bg-white text-black font-bold py-3.5 rounded-xl active:scale-[0.98] transition-transform text-[15px]"
+                  >
+                    Поделиться ссылкой
+                  </button>
+                </div>
+
+                {/* Sub-tabs */}
+                <div className="mt-2">
+                  <TabBar
+                    tabs={["Активность", "Друзья", "Бейджи"]}
+                    active={tokensSubTab}
+                    setActive={(t) => setTokensSubTab(t as SubTabTokens)}
+                  />
+                </div>
+
+                {tokensSubTab === "Активность" && (
+                  <div className="pb-4">
+                    <h4 className="text-[11px] font-bold text-white/35 uppercase tracking-wider mb-4 px-1">
+                      КАК ЗАРАБАТЫВАТЬ
+                    </h4>
+                    <div className="space-y-5">
+                      {[
+                        {
+                          icon: <Eye className="w-5 h-5 text-white/70" />,
+                          title: "Просмотр видео",
+                          sub: "25–100 Coins / видео, до 100 видео/день",
+                          reward: "25–100 С",
+                        },
+                        {
+                          icon: <Zap className="w-5 h-5 text-white/70" />,
+                          title: "Ежедневный чекин",
+                          sub: "50–500 Coins, 30-дневный цикл",
+                          reward: "50–500 С",
+                        },
+                        {
+                          icon: <User className="w-5 h-5 text-white/70" />,
+                          title: "Приглашение друга",
+                          sub: "+13000 coins",
+                          reward: "1000+ С",
+                          subColor: "#f59e0b",
+                        },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                              style={{ background: "rgba(255,255,255,0.07)" }}
+                            >
+                              {item.icon}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-[14px] text-white">{item.title}</div>
+                              <div
+                                className="text-[12px] mt-0.5"
+                                style={{ color: item.subColor ?? "rgba(255,255,255,0.45)" }}
+                              >
+                                {item.sub}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-[13px] font-bold text-white/80 shrink-0 ml-2">
+                            {item.reward}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {tokensSubTab === "Друзья" && (
+                  <div className="flex flex-col items-center py-10 text-white/40">
+                    <User className="w-10 h-10 mb-3 opacity-30" />
+                    <p className="text-[14px]">Пока нет приглашённых друзей</p>
+                  </div>
+                )}
+
+                {tokensSubTab === "Бейджи" && (
+                  <div className="flex flex-col items-center py-10 text-white/40">
+                    <Star className="w-10 h-10 mb-3 opacity-30" />
+                    <p className="text-[14px]">Бейджи появятся после выполнения заданий</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Магазин ── */}
+            {activeTab === "Магазин" && (
+              <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Sub-tabs */}
+                <TabBar
+                  tabs={["Бонусы", "Партнеры", "Розыгрыш", "Boost"]}
+                  active={shopSubTab}
+                  setActive={(t) => setShopSubTab(t as SubTabShop)}
+                />
+
+                {/* Empty/loading state */}
+                <div
+                  className="rounded-2xl p-10 flex flex-col items-center justify-center text-center mt-2"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
+                  <h3 className="text-[17px] font-bold text-white mb-3">
+                    Офферы загружаются
+                  </h3>
+                  <p className="text-[13px] text-white/45 leading-relaxed max-w-[260px]">
                     Скоро здесь появятся подписки, сервисы и гифт-карты от партнёров — обменивай токены на выгоду
                   </p>
                 </div>
               </div>
             )}
 
-            {/* Задания (Tasks) */}
+            {/* ── Задания ── */}
             {activeTab === "Задания" && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="text-[12px] font-bold text-white/40 uppercase tracking-wider px-2 mb-2">
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div className="text-[11px] font-bold text-white/35 uppercase tracking-wider px-1 mb-1">
                   КВЕСТЫ ДНЯ · 10 ИЮНЯ
                 </div>
 
-                <div className="glass-card rounded-2xl p-4 flex items-center justify-between mb-2">
+                {/* Bonus summary card */}
+                <div
+                  className="rounded-2xl px-5 py-4 flex items-center justify-between"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
                   <div>
-                    <div className="font-bold text-[15px] mb-0.5">Бонус за все 4 квеста</div>
-                    <div className="text-[13px] text-white/50">Выполнено 0/4</div>
+                    <div className="font-bold text-[15px] text-white mb-0.5">Бонус за все 4 квеста</div>
+                    <div className="text-[13px] text-white/45">Выполнено 0/4</div>
                   </div>
-                  <div className="bg-white/10 text-white/50 font-medium px-4 py-2 rounded-full text-[13px]">
+                  <div
+                    className="px-4 py-2 rounded-full text-[13px] font-medium text-white/50"
+                    style={{ background: "rgba(255,255,255,0.08)" }}
+                  >
                     +150 TRND
                   </div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 space-y-4">
+                {/* Quest 1 — complete */}
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                  }}
+                >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-[16px]">Посмотри 20 видео</div>
-                    <div className="text-[14px] font-bold text-white">+30 TRND</div>
-                  </div>
-                  <div className="text-[13px] text-white/50">Любых видео в ленте</div>
-                  
-                  <div className="pt-2">
-                    <div className="flex justify-between text-[12px] mb-2 font-medium">
-                      <span className="text-white/60">Прогресс</span>
-                      <span className="text-white">20 / 20</span>
+                    <div className="font-bold text-[16px] text-white">Посмотри 20 видео</div>
+                    <div className="text-right ml-4 shrink-0">
+                      <div className="text-[14px] font-bold text-white">+30</div>
+                      <div className="text-[11px] text-white/50">TRND</div>
                     </div>
-                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden mb-4">
-                      <div className="h-full bg-[#FBBF24] rounded-full w-full"></div>
-                    </div>
-                    <button className="w-full bg-white text-black font-bold py-3 rounded-xl active:scale-[0.98] transition-transform">
-                      Получить награду
-                    </button>
                   </div>
+                  <div className="text-[13px] text-white/50 mb-4">Любых видео в ленте</div>
+                  <div className="flex justify-between text-[12px] mb-2">
+                    <span className="text-white/50">Прогресс</span>
+                    <span className="text-white font-medium">20 / 20</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+                    <div className="h-full rounded-full w-full" style={{ background: "#f59e0b" }} />
+                  </div>
+                  <button
+                    data-testid="btn-claim-reward-1"
+                    className="w-full bg-white text-black font-bold py-3 rounded-xl active:scale-[0.98] transition-transform text-[15px]"
+                  >
+                    Получить награду
+                  </button>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 space-y-4">
+                {/* Quest 2 — not started */}
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                  }}
+                >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-[16px]">Зацени 3 разные категории</div>
-                    <div className="text-[14px] font-bold text-white">+30 TRND</div>
-                  </div>
-                  <div className="text-[13px] text-white/50">Расширь интересы</div>
-                  
-                  <div className="pt-2">
-                    <div className="flex justify-between text-[12px] mb-2 font-medium">
-                      <span className="text-white/60">Прогресс</span>
-                      <span className="text-white">0 / 3</span>
+                    <div className="font-bold text-[16px] text-white">Зацени 3 разные категории</div>
+                    <div className="text-right ml-4 shrink-0">
+                      <div className="text-[14px] font-bold text-white">+30</div>
+                      <div className="text-[11px] text-white/50">TRND</div>
                     </div>
-                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden mb-4">
-                      <div className="h-full bg-blue-500 rounded-full w-0"></div>
-                    </div>
-                    <button className="w-full bg-white/10 text-white/50 font-bold py-3 rounded-xl cursor-default">
-                      Прогресс...
-                    </button>
                   </div>
+                  <div className="text-[13px] text-white/50 mb-4">Расширь интересы</div>
+                  <div className="flex justify-between text-[12px] mb-2">
+                    <span className="text-white/50">Прогресс</span>
+                    <span className="text-white font-medium">0 / 3</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+                    <div className="h-full rounded-full w-0" style={{ background: "#6366f1" }} />
+                  </div>
+                  <button
+                    className="w-full font-bold py-3 rounded-xl text-[15px] cursor-default"
+                    style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.35)" }}
+                  >
+                    Прогресс...
+                  </button>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 space-y-4">
+                {/* Quest 3 — in progress */}
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                  }}
+                >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-[16px]">Посмотри 50 видео</div>
-                    <div className="text-[14px] font-bold text-white">+60 TRND</div>
-                  </div>
-                  <div className="text-[13px] text-white/50">Залипни на ленте</div>
-                  
-                  <div className="pt-2">
-                    <div className="flex justify-between text-[12px] mb-2 font-medium">
-                      <span className="text-white/60">Прогресс</span>
-                      <span className="text-white">46 / 50</span>
+                    <div className="font-bold text-[16px] text-white">Посмотри 50 видео</div>
+                    <div className="text-right ml-4 shrink-0">
+                      <div className="text-[14px] font-bold text-white">+60</div>
+                      <div className="text-[11px] text-white/50">TRND</div>
                     </div>
-                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden mb-4">
-                      <div className="h-full bg-blue-500 rounded-full w-[92%]"></div>
-                    </div>
-                    <button className="w-full bg-white/10 text-white/50 font-bold py-3 rounded-xl cursor-default">
-                      Прогресс...
-                    </button>
                   </div>
+                  <div className="text-[13px] text-white/50 mb-4">Залипни на ленте</div>
+                  <div className="flex justify-between text-[12px] mb-2">
+                    <span className="text-white/50">Прогресс</span>
+                    <span className="text-white font-medium">46 / 50</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+                    <div className="h-full rounded-full" style={{ background: "#6366f1", width: "92%" }} />
+                  </div>
+                  <button
+                    className="w-full font-bold py-3 rounded-xl text-[15px] cursor-default"
+                    style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.35)" }}
+                  >
+                    Прогресс...
+                  </button>
                 </div>
               </div>
             )}
-            
+
           </div>
         </div>
       </div>
