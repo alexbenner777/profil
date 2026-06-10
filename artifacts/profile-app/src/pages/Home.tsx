@@ -85,13 +85,13 @@ export default function Home() {
   return (
     <div
       className="min-h-[100dvh] w-full flex justify-center"
-      style={{ background: "#0c1523" }}
+      style={{ background: "#000" }}
     >
       <div
         className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col"
         style={{ background: "transparent" }}
       >
-        {/* Blurred background image — rendered via pseudo-layer img */}
+        {/* Blurred background image */}
         <img
           src={bgImg}
           aria-hidden
@@ -102,22 +102,11 @@ export default function Home() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center top",
-            filter: "blur(18px) brightness(0.45) saturate(0.7)",
+            filter: "blur(18px) brightness(0.6) saturate(0.8)",
             transform: "scale(1.12)",
             zIndex: 0,
             pointerEvents: "none",
             userSelect: "none",
-          }}
-        />
-        {/* Dark overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to bottom, rgba(8,15,30,0.45) 0%, rgba(8,15,30,0.7) 55%, rgba(8,15,30,0.92) 100%)",
-            zIndex: 1,
-            pointerEvents: "none",
           }}
         />
 
