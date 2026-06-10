@@ -26,8 +26,6 @@ const TrendsLogo = () => (
       height: 46,
       borderRadius: 14,
       background: "rgba(255,255,255,0.12)",
-      border: "1.5px solid rgba(255,255,255,0.22)",
-      backdropFilter: "blur(12px)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
