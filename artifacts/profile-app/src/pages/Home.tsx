@@ -285,10 +285,15 @@ export default function Home() {
                     <button
                       data-testid="btn-add-channel"
                       onClick={() => setHasChannel(true)}
-                      className="w-[56px] h-[56px] rounded-full flex items-center justify-center transition-colors hover:bg-white/5"
-                      style={{ border: "1.5px dashed rgba(255,255,255,0.25)" }}
+                      className="w-[56px] h-[56px] rounded-full flex items-center justify-center transition-colors active:scale-95"
+                      style={{
+                        background: "rgba(255,255,255,0.09)",
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        backdropFilter: "blur(12px)",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                      }}
                     >
-                      <Plus className="w-5 h-5 text-white/50" />
+                      <Plus className="w-5 h-5 text-white/55" />
                     </button>
                     <span className="text-[11px] text-white/50 w-[60px] text-center leading-tight">
                       {hasChannel ? "Ещё канал" : "Добавить канал"}
