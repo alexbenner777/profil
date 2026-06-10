@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Profile Page"
+version = "1.0.0"
+id = "artifacts/profile-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23547
+
+[services.development]
+run = "pnpm --filter @workspace/profile-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/profile-app", "run", "build" ]
+publicDir = "artifacts/profile-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23547"
+BASE_PATH = "/"
