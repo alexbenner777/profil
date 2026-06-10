@@ -398,10 +398,13 @@ export default function Home() {
                             </div>
                           </div>
                           <button
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-[13px] text-white shrink-0"
-                            style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.35)" }}
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-[13px] text-black shrink-0"
+                            style={{
+                              background: "linear-gradient(180deg, #ffffff 0%, #ebebeb 100%)",
+                              boxShadow: "0 2px 5px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12), inset 0 1.5px 0 rgba(255,255,255,0.9)",
+                            }}
                           >
-                            <Star className="w-3.5 h-3.5 text-[#f59e0b]" />
+                            <Star className="w-3.5 h-3.5" style={{ color: "#f59e0b", fill: "#f59e0b" }} />
                             Пополнить
                           </button>
                         </div>
