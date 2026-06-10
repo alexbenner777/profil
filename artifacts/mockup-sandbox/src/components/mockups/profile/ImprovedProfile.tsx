@@ -56,11 +56,13 @@ export function ImprovedProfile() {
 
       {/* logo + balance row */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 18px 14px" }}>
-        <div style={{ width:44, height:44, borderRadius:12, background:"linear-gradient(145deg,#3a6fdf,#1a4bbf)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="white"/>
-          </svg>
-        </div>
+        <div style={{
+          width:44, height:44, borderRadius:12, overflow:"hidden", flexShrink:0,
+          backgroundImage:"url('/__mockup/screenshot.jpg')",
+          backgroundSize:"387px 840px",
+          backgroundPosition:"-14px -87px",
+          backgroundRepeat:"no-repeat",
+        }} />
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ textAlign:"right" }}>
             <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)" }}>Баланс TRND</div>
