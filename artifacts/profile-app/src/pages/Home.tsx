@@ -88,8 +88,8 @@ export default function Home() {
       style={{ background: "#000" }}
     >
       <div
-        className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col"
-        style={{ background: "transparent" }}
+        className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col overflow-hidden"
+        style={{ background: "transparent", borderRadius: 40 }}
       >
         {/* Blurred background image */}
         <img
