@@ -360,7 +360,7 @@ export default function Home() {
                         ].map((s) => (
                           <div
                             key={s.label}
-                            className="flex flex-col items-center py-2.5 rounded-lg"
+                            className="flex flex-col items-center py-2.5 rounded-md"
                             style={{
                               background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
                               border: "1px solid rgba(255,255,255,0.14)",
