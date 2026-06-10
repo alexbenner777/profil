@@ -58,7 +58,7 @@ const TabBar = ({
   active: string;
   setActive: (t: string) => void;
 }) => (
-  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
     {tabs.map((tab) => (
       <button
         key={tab}
