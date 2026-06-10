@@ -1,5 +1,6 @@
 import { useState } from "react";
 import logoImg from "@assets/logo_trends_1781102455128.png";
+const bgImg = `${import.meta.env.BASE_URL}bg.jpg`;
 import {
   ChevronLeft,
   ChevronDown,
@@ -87,14 +88,41 @@ export default function Home() {
       style={{ background: "#0c1523" }}
     >
       <div
-        className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(ellipse 120% 60% at 50% 0%, #1e3a6e 0%, #111e35 45%, #0c1523 100%)",
-        }}
+        className="w-full max-w-[430px] min-h-[100dvh] relative flex flex-col"
+        style={{ background: "transparent" }}
       >
+        {/* Blurred background image — rendered via pseudo-layer img */}
+        <img
+          src={bgImg}
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center top",
+            filter: "blur(18px) brightness(0.45) saturate(0.7)",
+            transform: "scale(1.12)",
+            zIndex: 0,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
+        {/* Dark overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, rgba(8,15,30,0.45) 0%, rgba(8,15,30,0.7) 55%, rgba(8,15,30,0.92) 100%)",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+
         {/* Sticky Header */}
-        <div className="sticky top-0 z-50 px-4 pt-4 pb-3" style={{ background: "transparent" }}>
+        <div className="sticky top-0 z-50 px-4 pt-4 pb-3" style={{ background: "transparent", position: "relative", zIndex: 10 }}>
           {/* Nav row */}
           <div className="flex items-center justify-between mb-4">
             <button
@@ -197,7 +225,7 @@ export default function Home() {
         )}
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", position: "relative", zIndex: 10 }}>
           {/* Profile section */}
           <div className="px-4 mt-1 mb-5 flex justify-between items-start">
             <div>
