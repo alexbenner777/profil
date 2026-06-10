@@ -179,41 +179,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Sticky bottom bar — only when channel exists on Каналы tab */}
-        {activeTab === "Каналы" && hasChannel && (
-          <div
-            className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-2"
-            style={{
-              background: "linear-gradient(to top, rgba(12,21,35,0.98) 60%, transparent)",
-              zIndex: 40,
-            }}
-          >
-            <button
-              className="w-full bg-white text-black font-bold py-4 rounded-2xl text-[16px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-xl"
-            >
-              <Plus className="w-5 h-5" />
-              Добавить видео в ленту
-            </button>
-            <div
-              className="flex items-center mt-2 rounded-2xl p-1"
-              style={{ background: "rgba(255,255,255,0.07)" }}
-            >
-              {(["Опубликовано", "На проверке"] as SubTabChannel[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setChannelSubTab(t)}
-                  className={`flex-1 py-2.5 text-[14px] font-semibold rounded-xl transition-all duration-200 ${
-                    channelSubTab === t
-                      ? "bg-white text-black shadow-sm"
-                      : "text-white/50 hover:text-white/80"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", position: "relative", zIndex: 10 }}>
@@ -259,7 +224,7 @@ export default function Home() {
           </div>
 
           {/* Tab content — extra bottom padding when channel sticky bar is shown */}
-          <div className={`px-4 ${activeTab === "Каналы" && hasChannel ? "pb-[130px]" : "pb-10"}`}>
+          <div className="px-4 pb-10">
 
             {/* ── Каналы ── */}
             {activeTab === "Каналы" && (
@@ -303,7 +268,7 @@ export default function Home() {
 
                 {hasChannel ? (
                   /* ── Channel detail card ── */
-                  <div className="space-y-0 pb-28">
+                  <div className="space-y-3 pb-10">
                     <div
                       className="rounded-2xl p-4 space-y-2.5"
                       style={{
@@ -410,6 +375,32 @@ export default function Home() {
                         </div>
                       </div>
 
+                    </div>
+
+                    {/* Add video + tab switcher — inline below card */}
+                    <button
+                      className="w-full bg-white text-black font-bold py-4 rounded-2xl text-[16px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-xl"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Добавить видео в ленту
+                    </button>
+                    <div
+                      className="flex items-center rounded-2xl p-1"
+                      style={{ background: "rgba(255,255,255,0.07)" }}
+                    >
+                      {(["Опубликовано", "На проверке"] as SubTabChannel[]).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setChannelSubTab(t)}
+                          className={`flex-1 py-2.5 text-[14px] font-semibold rounded-xl transition-all duration-200 ${
+                            channelSubTab === t
+                              ? "bg-white text-black shadow-sm"
+                              : "text-white/50 hover:text-white/80"
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 ) : (
