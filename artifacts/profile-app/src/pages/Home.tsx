@@ -58,7 +58,7 @@ const TabBar = ({
   active: string;
   setActive: (t: string) => void;
 }) => (
-  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 100%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)" }}>
+  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 100%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 4px 12px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.15), inset 0 1.5px 0 rgba(255,255,255,0.32)" }}>
     {tabs.map((tab) => (
       <button
         key={tab}
@@ -144,7 +144,7 @@ export default function Home() {
                 padding: "8px 14px 8px 8px",
                 gap: 10,
                 minHeight: 62,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.15), inset 0 1.5px 0 rgba(255,255,255,0.32)",
               }}
             >
               <TrendsLogo />
@@ -171,7 +171,7 @@ export default function Home() {
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.15), inset 0 1.5px 0 rgba(255,255,255,0.32)",
               }}
             >
               <Settings style={{ width: 20, height: 20, color: "rgba(255,255,255,0.55)" }} />
@@ -290,7 +290,7 @@ export default function Home() {
                         background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
                         border: "1px solid rgba(255,255,255,0.14)",
                         backdropFilter: "blur(12px)",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.15), inset 0 1.5px 0 rgba(255,255,255,0.32)",
                       }}
                     >
                       <Plus className="w-5 h-5 text-white/55" />
@@ -398,7 +398,7 @@ export default function Home() {
                       style={{
                         background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.05) 100%)",
                         border: "1px solid rgba(255,255,255,0.07)",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.15), inset 0 1.5px 0 rgba(255,255,255,0.32)",
                       }}
                     >
                       <div className="text-4xl mb-4">📡</div>
