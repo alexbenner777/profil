@@ -1,586 +1,434 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 type Tab = "channels" | "tokens" | "shop" | "tasks";
 
-/* ─── Animated Canvas Background ─── */
-function AnimatedBG() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+/* ─── tiny reusable pieces ─── */
+const SatelliteIcon = () => (
+  <svg width="52" height="52" viewBox="0 0 64 64" fill="none">
+    <circle cx="32" cy="32" r="30" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5"/>
+    <path d="M20 44 L44 20" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
+    <ellipse cx="26" cy="38" rx="10" ry="7" transform="rotate(-45 26 38)" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"/>
+    <circle cx="40" cy="24" r="5" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"/>
+    <circle cx="40" cy="24" r="2" fill="rgba(255,255,255,0.6)"/>
+    <line x1="44" y1="20" x2="50" y2="16" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
+    <line x1="44" y1="24" x2="52" y2="24" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
+    <line x1="40" y1="28" x2="40" y2="36" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
+  </svg>
+);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    let raf: number;
-    let t = 0;
+const GearIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+);
 
-    const W = canvas.width = 390;
-    const H = canvas.height = 844;
-
-    // Orbs — big soft blobs that drift slowly
-    const orbs = [
-      { x: 80,  y: 200, r: 220, cx: 80,  cy: 200, vx: 0.18, vy: 0.12, color: [30, 80, 220]  },
-      { x: 320, y: 600, r: 200, cx: 320, cy: 600, vx: -0.14, vy: -0.10, color: [80, 20, 180] },
-      { x: 200, y: 420, r: 180, cx: 200, cy: 420, vx: 0.10, vy: 0.16,  color: [10, 120, 200] },
-      { x: 50,  y: 750, r: 160, cx: 50,  cy: 750, vx: 0.20, vy: -0.08, color: [60, 40, 200]  },
-      { x: 360, y: 100, r: 150, cx: 360, cy: 100, vx: -0.12, vy: 0.14, color: [20, 60, 160]  },
-    ];
-
-    // Particles
-    const particles: { x: number; y: number; r: number; vx: number; vy: number; alpha: number; }[] = [];
-    for (let i = 0; i < 55; i++) {
-      particles.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: Math.random() * 1.8 + 0.4,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        alpha: Math.random() * 0.5 + 0.15,
-      });
-    }
-
-    function draw() {
-      t += 0.005;
-
-      // Base dark background
-      ctx.fillStyle = "#060c1e";
-      ctx.fillRect(0, 0, W, H);
-
-      // Draw orbs
-      for (const o of orbs) {
-        o.cx += o.vx;
-        o.cy += o.vy;
-        // bounce inside canvas
-        if (o.cx < -o.r) o.cx = W + o.r;
-        if (o.cx > W + o.r) o.cx = -o.r;
-        if (o.cy < -o.r) o.cy = H + o.r;
-        if (o.cy > H + o.r) o.cy = -o.r;
-
-        const [r, g, b] = o.color;
-        const grad = ctx.createRadialGradient(o.cx, o.cy, 0, o.cx, o.cy, o.r);
-        grad.addColorStop(0, `rgba(${r},${g},${b},0.55)`);
-        grad.addColorStop(0.5, `rgba(${r},${g},${b},0.2)`);
-        grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        ctx.beginPath();
-        ctx.arc(o.cx, o.cy, o.r, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-      }
-
-      // Subtle scanline-like wave overlay
-      for (let y = 0; y < H; y += 3) {
-        const alpha = 0.018 * Math.sin(y * 0.04 + t * 2);
-        if (alpha > 0) {
-          ctx.fillStyle = `rgba(100,140,255,${alpha})`;
-          ctx.fillRect(0, y, W, 1.5);
-        }
-      }
-
-      // Particles
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) p.x = W;
-        if (p.x > W) p.x = 0;
-        if (p.y < 0) p.y = H;
-        if (p.y > H) p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(160,200,255,${p.alpha})`;
-        ctx.fill();
-      }
-
-      // Top vignette
-      const vTop = ctx.createLinearGradient(0, 0, 0, 160);
-      vTop.addColorStop(0, "rgba(4,8,24,0.7)");
-      vTop.addColorStop(1, "rgba(4,8,24,0)");
-      ctx.fillStyle = vTop;
-      ctx.fillRect(0, 0, W, 160);
-
-      // Bottom vignette
-      const vBot = ctx.createLinearGradient(0, H - 200, 0, H);
-      vBot.addColorStop(0, "rgba(4,8,24,0)");
-      vBot.addColorStop(1, "rgba(4,8,24,0.75)");
-      ctx.fillStyle = vBot;
-      ctx.fillRect(0, H - 200, W, 200);
-
-      raf = requestAnimationFrame(draw);
-    }
-
-    draw();
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "fixed",
-        top: 0, left: "50%",
-        transform: "translateX(-50%)",
-        width: 390, height: "100%",
-        zIndex: 0,
-        filter: "blur(22px) saturate(1.5)",
-        transform: "translateX(-50%) scale(1.15)",
-      }}
-    />
-  );
-}
-
-/* ─── Glass Styles ─── */
-const glassCard: React.CSSProperties = {
-  background: "rgba(255,255,255,0.07)",
-  backdropFilter: "blur(28px) saturate(1.5)",
-  WebkitBackdropFilter: "blur(28px) saturate(1.5)",
-  border: "1px solid rgba(255,255,255,0.13)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.15)",
-};
-
-const liquidGlassBtn: React.CSSProperties = {
-  background: "linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0.14) 100%)",
-  backdropFilter: "blur(20px) saturate(1.7)",
-  WebkitBackdropFilter: "blur(20px) saturate(1.7)",
-  border: "1px solid rgba(255,255,255,0.24)",
-  boxShadow: "0 4px 24px rgba(0,0,0,0.28), inset 0 1.5px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.14), inset 1px 0 0 rgba(255,255,255,0.18)",
-  position: "relative",
-  overflow: "hidden",
-};
-
-const liquidGlassBtnBlue: React.CSSProperties = {
-  background: "linear-gradient(145deg, rgba(100,165,255,0.55) 0%, rgba(45,110,245,0.28) 55%, rgba(90,155,255,0.48) 100%)",
-  backdropFilter: "blur(20px) saturate(1.9)",
-  WebkitBackdropFilter: "blur(20px) saturate(1.9)",
-  border: "1px solid rgba(140,190,255,0.42)",
-  boxShadow: "0 4px 28px rgba(79,142,247,0.38), inset 0 1.5px 0 rgba(200,225,255,0.55), inset 0 -1px 0 rgba(0,20,80,0.22), inset 1px 0 0 rgba(160,200,255,0.28)",
-  position: "relative",
-  overflow: "hidden",
-};
-
-const liquidGlassBtnGold: React.CSSProperties = {
-  background: "linear-gradient(145deg, rgba(255,215,80,0.72) 0%, rgba(245,166,35,0.42) 55%, rgba(255,200,60,0.65) 100%)",
-  backdropFilter: "blur(20px) saturate(1.9)",
-  WebkitBackdropFilter: "blur(20px) saturate(1.9)",
-  border: "1px solid rgba(255,225,100,0.52)",
-  boxShadow: "0 4px 24px rgba(247,201,72,0.35), inset 0 1.5px 0 rgba(255,245,170,0.65), inset 0 -1px 0 rgba(100,60,0,0.2)",
-  position: "relative",
-  overflow: "hidden",
-};
-
-function GlassShine() {
-  return (
-    <span style={{
-      position: "absolute",
-      top: 0, left: "-60%",
-      width: "50%", height: "100%",
-      background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.32) 50%, transparent 80%)",
-      transform: "skewX(-20deg)",
-      pointerEvents: "none",
-    }} />
-  );
-}
-
-/* ─── Main Component ─── */
 export function ImprovedProfile() {
   const [activeTab, setActiveTab] = useState<Tab>("channels");
-  const [shopTab, setShopTab]     = useState("bonuses");
-  const [tokenTab, setTokenTab]   = useState("activity");
+  const [hasChannel, setHasChannel] = useState(true);
+  const [shopSub, setShopSub] = useState("Бонусы");
+  const [tokenSub, setTokenSub] = useState("Активность");
+
+  /* ── shared header ── */
+  const Header = () => (
+    <>
+      {/* status bar */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 18px 4px", fontSize:13, fontWeight:600 }}>
+        <span>14:34 🔕</span>
+        <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M0 12h2V7H0v5zm3 0h2V5H3v7zm3 0h2V3H6v9zm3 0h2V1H9v11zm3 0h2V0h-2v12z"/></svg>
+          <svg width="16" height="12" viewBox="0 0 24 24" fill="white"><path fillRule="evenodd" d="M1.5 8.4C4.2 5.6 7.9 4 12 4s7.8 1.6 10.5 4.4L21 9.9C18.7 7.5 15.5 6 12 6S5.3 7.5 3 9.9L1.5 8.4zm3 3C6.6 9.2 9.2 8 12 8s5.4 1.2 7.5 3.4L18 12.9C16.3 11.1 14.3 10 12 10s-4.3 1.1-6 2.9L7.5 11.4zm3 3C9.1 12.8 10.5 12 12 12s2.9.8 3.5 2.4L14 15.9c-.5-.6-1.2-.9-2-.9s-1.5.3-2 .9L9.5 14.4z"/></svg>
+          <div style={{ background:"rgba(255,255,255,0.9)", borderRadius:4, padding:"2px 6px", color:"#0d1628", fontSize:11, fontWeight:700 }}>51</div>
+        </div>
+      </div>
+
+      {/* nav */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"4px 18px 10px" }}>
+        <button style={{ display:"flex", alignItems:"center", gap:5, fontSize:15, color:"rgba(255,255,255,0.85)", background:"none", border:"none", cursor:"pointer", padding:0 }}>
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 1L1 7l6 6"/></svg>
+          Назад
+        </button>
+        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2"><circle cx="5" cy="12" r="1.5" fill="rgba(255,255,255,0.75)"/><circle cx="12" cy="12" r="1.5" fill="rgba(255,255,255,0.75)"/><circle cx="19" cy="12" r="1.5" fill="rgba(255,255,255,0.75)"/></svg>
+        </div>
+      </div>
+
+      {/* logo + balance row */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 18px 14px" }}>
+        <div style={{ width:44, height:44, borderRadius:12, background:"linear-gradient(145deg,#3a6fdf,#1a4bbf)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="white"/>
+          </svg>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)" }}>Баланс TRND</div>
+            <div style={{ fontSize:24, fontWeight:700, lineHeight:1.1 }}>40</div>
+          </div>
+          <GearIcon />
+        </div>
+      </div>
+
+      {/* user info */}
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", padding:"0 18px 14px" }}>
+        <div>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+            <span style={{ fontSize:20, fontWeight:700 }}>Миша Зевс</span>
+            <span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, fontWeight:600, color:"#d4aa50", background:"rgba(212,170,80,0.15)", border:"1px solid rgba(212,170,80,0.3)", padding:"2px 8px", borderRadius:999 }}>
+              🥈 SILVER
+            </span>
+          </div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,0.45)", marginBottom:4 }}>@misha_zeus</div>
+          <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:12, color:"rgba(255,255,255,0.38)" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            с 10 июня 2026 г.
+          </div>
+        </div>
+        {/* avatar */}
+        <div style={{ width:54, height:54, borderRadius:"50%", background:"linear-gradient(135deg,#2a2a3a,#1a1a2a)", border:"2px solid rgba(255,255,255,0.15)", overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.5)" }}>МЗ</div>
+      </div>
+
+      {/* tabs */}
+      <div style={{ display:"flex", padding:"0 14px 16px", gap:2 }}>
+        {(["channels","tokens","shop","tasks"] as Tab[]).map((t, i) => {
+          const labels = ["Каналы","Токены","Магазин","Задания"];
+          const active = activeTab === t;
+          return (
+            <button key={t} onClick={() => setActiveTab(t)} style={{
+              flex:1, padding:"8px 0", borderRadius:20, fontSize:13, fontWeight: active ? 600 : 400,
+              background: active ? "rgba(255,255,255,0.92)" : "transparent",
+              color: active ? "#0d1628" : "rgba(255,255,255,0.45)",
+              border:"none", cursor:"pointer",
+            }}>
+              {labels[i]}
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+
+  /* ── channels: empty state ── */
+  const ChannelsEmpty = () => (
+    <div style={{ padding:"0 16px 24px" }}>
+      {/* add circle */}
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", width:64, marginBottom:16 }}>
+        <div style={{ width:56, height:56, borderRadius:"50%", border:"1.5px dashed rgba(255,255,255,0.3)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:6 }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <span style={{ fontSize:11, color:"rgba(255,255,255,0.45)", textAlign:"center", lineHeight:1.3 }}>Добавить<br/>канал</span>
+      </div>
+
+      {/* empty state card */}
+      <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:16, padding:"28px 20px", textAlign:"center", marginBottom:16, border:"1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ marginBottom:14, display:"flex", justifyContent:"center" }}><SatelliteIcon /></div>
+        <div style={{ fontSize:15, fontWeight:600, marginBottom:6 }}>Нет добавленных каналов</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.45)", lineHeight:1.5 }}>
+          Добавь свой Telegram-канал, чтобы видео появились в ленте Trends
+        </div>
+      </div>
+
+      {/* how it works */}
+      <div style={{ padding:"0 4px 16px" }}>
+        <div style={{ fontSize:13, fontWeight:600, marginBottom:10 }}>Как это работает</div>
+        {[
+          "Нажми «Добавить свой канал» ниже",
+          "Следуй инструкциям в боте @ContentifyAI_Bot",
+          "Добавь бота как администратора в канал",
+          "После одобрения видео появятся в ленте",
+        ].map((s, i) => (
+          <div key={i} style={{ display:"flex", gap:8, marginBottom:6, fontSize:13, color:"rgba(255,255,255,0.55)" }}>
+            <span style={{ color:"rgba(255,255,255,0.35)", minWidth:14 }}>{i+1}.</span>
+            <span>{s}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* add channel button card */}
+      <div style={{ background:"rgba(255,255,255,0.07)", borderRadius:14, padding:"14px 16px", display:"flex", alignItems:"center", gap:14, border:"1px solid rgba(255,255,255,0.1)" }}>
+        <div style={{ width:40, height:40, borderRadius:10, background:"rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z"/></svg>
+        </div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:14, fontWeight:600 }}>Добавить свой канал</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", marginTop:2 }}>Монетизируй контент через Trends</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </div>
+    </div>
+  );
+
+  /* ── channels: has channel ── */
+  const ChannelsWithChannel = () => (
+    <div style={{ padding:"0 16px 24px" }}>
+      {/* channel bubbles */}
+      <div style={{ display:"flex", gap:20, marginBottom:16 }}>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+          <div style={{ width:56, height:56, borderRadius:"50%", background:"linear-gradient(145deg,#7c3aed,#4c1d95)", border:"2px solid rgba(140,92,246,0.6)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:700 }}>МО</div>
+          <span style={{ fontSize:11, color:"rgba(255,255,255,0.7)" }}>Мой канал</span>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+          <div style={{ width:56, height:56, borderRadius:"50%", border:"1.5px dashed rgba(255,255,255,0.25)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <span style={{ fontSize:11, color:"rgba(255,255,255,0.45)" }}>Ещё канал</span>
+        </div>
+      </div>
+
+      {/* channel info card */}
+      <div style={{ background:"rgba(15,18,32,0.85)", borderRadius:16, padding:16, marginBottom:16, border:"1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+          <span style={{ fontSize:15, fontWeight:600 }}>Мой канал</span>
+          <span style={{ display:"flex", alignItems:"center", gap:4, fontSize:12, color:"rgba(255,255,255,0.7)" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Одобрен
+          </span>
+        </div>
+
+        {/* action buttons */}
+        <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+          <button style={{ flex:1, padding:"10px 0", borderRadius:12, background:"rgba(255,255,255,0.92)", color:"#0d1628", fontSize:13, fontWeight:600, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Страница Trends
+          </button>
+          <button style={{ flex:1, padding:"10px 0", borderRadius:12, background:"transparent", color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:500, border:"1px solid rgba(255,255,255,0.2)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Редактировать
+          </button>
+        </div>
+
+        {/* stats */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:6, marginBottom:16 }}>
+          {["Видео","Просмотры","Лайки","Переходов","Подписок"].map((s) => (
+            <div key={s} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, padding:"8px 2px", borderRadius:10, background:"rgba(255,255,255,0.05)" }}>
+              <span style={{ fontSize:15, fontWeight:700 }}>0</span>
+              <span style={{ fontSize:9, color:"rgba(255,255,255,0.38)", textAlign:"center", lineHeight:1.2 }}>{s}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* rewards */}
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)", letterSpacing:0.8, marginBottom:6 }}>НАГРАДЫ ПОДПИСЧИКАМ</div>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div>
+              <div style={{ fontSize:16, fontWeight:700, marginBottom:2 }}>0 <span style={{ fontSize:13, fontWeight:400, color:"rgba(255,255,255,0.6)" }}>TRND</span></div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>Пополни баланс чтобы начать назначать<br/>награды</div>
+            </div>
+            <button style={{ display:"flex", alignItems:"center", gap:5, padding:"8px 14px", borderRadius:10, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", color:"rgba(255,255,255,0.8)", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+              ⭐ Пополнить
+            </button>
+          </div>
+        </div>
+
+        {/* hint */}
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>
+          💡 Купи Stars → они станут TRND → выбери видео → установи награду
+        </div>
+      </div>
+
+      {/* add video button */}
+      <button style={{ width:"100%", padding:"15px 0", borderRadius:14, background:"rgba(255,255,255,0.9)", color:"#0d1628", fontSize:15, fontWeight:600, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Добавить видео в ленту
+      </button>
+
+      {/* published / review tabs */}
+      <div style={{ display:"flex", gap:8 }}>
+        <button style={{ flex:1, padding:"10px 0", borderRadius:12, background:"rgba(255,255,255,0.9)", color:"#0d1628", fontSize:13, fontWeight:600, border:"none", cursor:"pointer" }}>Опубликовано</button>
+        <button style={{ flex:1, padding:"10px 0", borderRadius:12, background:"transparent", color:"rgba(255,255,255,0.5)", fontSize:13, border:"1px solid rgba(255,255,255,0.12)", cursor:"pointer" }}>На проверке</button>
+      </div>
+    </div>
+  );
+
+  /* ── tokens ── */
+  const Tokens = () => (
+    <div style={{ padding:"0 16px 24px" }}>
+      {/* balance */}
+      <div style={{ textAlign:"center", paddingBottom:20 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, marginBottom:4 }}>
+          <span style={{ fontSize:52, fontWeight:700, lineHeight:1 }}>40</span>
+          <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,0.12)", border:"1.5px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:700 }}>T</div>
+        </div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.55)", marginBottom:6 }}>TRND</div>
+        <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", lineHeight:1.6, maxWidth:260, margin:"0 auto" }}>
+          Trends начисляет TRND за просмотры, стрики и приглашения друзей
+        </div>
+      </div>
+
+      {/* invite card */}
+      <div style={{ background:"rgba(10,12,24,0.9)", borderRadius:16, padding:16, marginBottom:16, border:"1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+          <div>
+            <div style={{ fontSize:15, fontWeight:600, marginBottom:2 }}>Пригласить друга</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)" }}>+13000 Т вам и другу</div>
+          </div>
+          <button style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 12px", borderRadius:10, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.1)", color:"rgba(255,255,255,0.8)", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            0
+          </button>
+        </div>
+
+        {/* link row */}
+        <div style={{ display:"flex", alignItems:"center", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:"10px 12px", marginBottom:12, gap:8 }}>
+          <span style={{ flex:1, fontSize:12, color:"rgba(255,255,255,0.45)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            t.me/ContentifyAI_Bot?startapp=ref_288113313
+          </span>
+          <button style={{ background:"none", border:"none", cursor:"pointer", padding:4 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button style={{ background:"none", border:"none", cursor:"pointer", padding:4 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+
+        <button style={{ width:"100%", padding:"13px 0", borderRadius:12, background:"rgba(255,255,255,0.9)", color:"#0d1628", fontSize:14, fontWeight:600, border:"none", cursor:"pointer" }}>
+          Поделиться ссылкой
+        </button>
+      </div>
+
+      {/* sub-tabs */}
+      <div style={{ display:"flex", gap:4, marginBottom:14 }}>
+        {["Активность","Друзья","Бейджи"].map((t) => (
+          <button key={t} onClick={() => setTokenSub(t)} style={{
+            flex:1, padding:"9px 0", borderRadius:20, fontSize:13,
+            fontWeight: tokenSub === t ? 600 : 400,
+            background: tokenSub === t ? "rgba(255,255,255,0.9)" : "transparent",
+            color: tokenSub === t ? "#0d1628" : "rgba(255,255,255,0.45)",
+            border:"none", cursor:"pointer",
+          }}>
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {tokenSub === "Активность" && (
+        <div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", letterSpacing:0.8, marginBottom:12 }}>КАК ЗАРАБАТЫВАТЬ</div>
+          {[
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>, label:"Просмотр видео", sub:"25–100 Coins / видео, до 100 видео/день", reward:"25–100 С" },
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, label:"Ежедневный чекин", sub:"50–500 Coins, 30-дневный цикл", reward:"50–500 С" },
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>, label:"Приглашение друга", sub:"+1000 Coins за каждого", reward:"+1000 С" },
+          ].map((item) => (
+            <div key={item.label} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 14px", borderRadius:14, background:"rgba(255,255,255,0.05)", marginBottom:8, border:"1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:"rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"center" }}>{item.icon}</div>
+                <div>
+                  <div style={{ fontSize:13, fontWeight:600, marginBottom:2 }}>{item.label}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.38)" }}>{item.sub}</div>
+                </div>
+              </div>
+              <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.85)", flexShrink:0 }}>{item.reward}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  /* ── shop ── */
+  const Shop = () => (
+    <div style={{ padding:"0 16px 24px" }}>
+      <div style={{ display:"flex", gap:4, marginBottom:16 }}>
+        {["Бонусы","Партнеры","Розыгрыш","Boost"].map((t) => (
+          <button key={t} onClick={() => setShopSub(t)} style={{
+            flex:1, padding:"9px 0", borderRadius:20, fontSize:12,
+            fontWeight: shopSub === t ? 600 : 400,
+            background: shopSub === t ? "rgba(255,255,255,0.9)" : "transparent",
+            color: shopSub === t ? "#0d1628" : "rgba(255,255,255,0.45)",
+            border:"none", cursor:"pointer",
+          }}>
+            {t}
+          </button>
+        ))}
+      </div>
+      <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:16, padding:"32px 20px", textAlign:"center", border:"1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ fontSize:15, fontWeight:600, marginBottom:8 }}>Офферы загружаются</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.42)", lineHeight:1.6 }}>
+          Скоро здесь появятся подписки, сервисы и<br/>гифт-карты от партнёров — обменивай<br/>токены на выгоду
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ── tasks ── */
+  const Tasks = () => (
+    <div style={{ padding:"0 16px 24px" }}>
+      <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", letterSpacing:0.8, marginBottom:12 }}>КВЕСТЫ ДНЯ · 10 ИЮНЯ</div>
+
+      {/* all quests bonus */}
+      <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:14, padding:"14px 16px", marginBottom:14, display:"flex", alignItems:"center", justifyContent:"space-between", border:"1px solid rgba(255,255,255,0.08)" }}>
+        <div>
+          <div style={{ fontSize:14, fontWeight:600 }}>Бонус за все 4 квеста</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", marginTop:2 }}>Выполнено 0/4</div>
+        </div>
+        <span style={{ padding:"7px 12px", borderRadius:10, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.8)" }}>+150 TRND</span>
+      </div>
+
+      {/* quest cards */}
+      {[
+        { title:"Посмотри 20 видео", sub:"Любых видео в ленте", reward:"+30", progress:20, total:20, done:true, barColor:"linear-gradient(90deg,#e8a020,#f0c040)" },
+        { title:"Зацени 3 разные категории", sub:"Расширь интересы", reward:"+30", progress:0, total:3, done:false, barColor:"linear-gradient(90deg,#3b82f6,#2563eb)" },
+        { title:"Посмотри 50 видео", sub:"Залипни на ленте", reward:"+60", progress:46, total:50, done:false, barColor:"linear-gradient(90deg,#3b82f6,#2563eb)" },
+      ].map((q) => (
+        <div key={q.title} style={{ background:"rgba(12,15,28,0.9)", borderRadius:16, padding:16, marginBottom:12, border:"1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
+            <div>
+              <div style={{ fontSize:14, fontWeight:600, marginBottom:3 }}>{q.title}</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)" }}>{q.sub}</div>
+            </div>
+            <div style={{ textAlign:"right", flexShrink:0 }}>
+              <div style={{ fontSize:15, fontWeight:700 }}>{q.reward}</div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)" }}>TRND</div>
+            </div>
+          </div>
+
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:12, color:"rgba(255,255,255,0.35)" }}>Прогресс</span>
+            <span style={{ fontSize:12, color:"rgba(255,255,255,0.55)" }}>{q.progress} / {q.total}</span>
+          </div>
+
+          <div style={{ height:5, borderRadius:999, background:"rgba(255,255,255,0.1)", marginBottom:12, overflow:"hidden" }}>
+            <div style={{ height:"100%", borderRadius:999, background:q.barColor, width:`${(q.progress/q.total)*100}%` }} />
+          </div>
+
+          {q.done ? (
+            <button style={{ width:"100%", padding:"13px 0", borderRadius:12, background:"rgba(255,255,255,0.92)", color:"#0d1628", fontSize:14, fontWeight:600, border:"none", cursor:"pointer" }}>
+              Получить награду
+            </button>
+          ) : (
+            <button style={{ width:"100%", padding:"13px 0", borderRadius:12, background:"rgba(255,255,255,0.06)", color:"rgba(255,255,255,0.3)", fontSize:14, border:"1px solid rgba(255,255,255,0.07)", cursor:"default" }}>
+              Прогресс...
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div style={{
-      position: "relative",
-      width: 390,
-      minHeight: "100vh",
-      overflow: "hidden",
-      fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
-      color: "#fff",
-      margin: "0 auto",
+      width:390, minHeight:"100vh", overflowX:"hidden",
+      background:"linear-gradient(180deg, #1e2d50 0%, #1a2540 20%, #131f38 50%, #0d1628 100%)",
+      fontFamily:"'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
+      color:"#fff", margin:"0 auto", position:"relative",
     }}>
-      <AnimatedBG />
-
-      {/* Dark overlay to unify look */}
+      {/* atmospheric glow */}
       <div style={{
-        position: "fixed",
-        inset: 0,
-        background: "linear-gradient(160deg, rgba(6,12,30,0.42) 0%, rgba(3,8,20,0.52) 100%)",
-        zIndex: 1,
+        position:"fixed", top:120, left:"50%", transform:"translateX(-50%)",
+        width:300, height:300, borderRadius:"50%",
+        background:"radial-gradient(circle, rgba(50,80,160,0.35) 0%, rgba(30,50,120,0.1) 60%, transparent 100%)",
+        filter:"blur(40px)", pointerEvents:"none", zIndex:0,
       }} />
 
-      {/* All UI content */}
-      <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-
-        {/* Status Bar */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px 4px", fontSize: 13, fontWeight: 600 }}>
-          <span>14:34</span>
-          <div style={{ background: "rgba(255,255,255,0.85)", borderRadius: 4, padding: "2px 7px", color: "#060c1e", fontSize: 11, fontWeight: 700 }}>51%</div>
-        </div>
-
-        {/* Nav */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 16px 8px" }}>
-          <button style={{ ...liquidGlassBtn, display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, fontSize: 13, color: "rgba(255,255,255,0.85)", cursor: "pointer" }}>
-            <GlassShine />
-            <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 1L1 6l5 5"/></svg>
-            Назад
-          </button>
-          <div style={{ display: "flex", gap: 8 }}>
-            {[
-              <svg key="v" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>,
-              <svg key="d" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>,
-            ].map((icon, i) => (
-              <button key={i} style={{ ...liquidGlassBtn, width: 32, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <GlassShine />{icon}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Header Card */}
-        <div style={{ ...glassCard, margin: "0 16px 12px", borderRadius: 24, padding: 16 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center",
-              background: "linear-gradient(135deg, rgba(79,142,247,0.65), rgba(45,110,245,0.45))",
-              border: "1px solid rgba(120,170,255,0.42)",
-              boxShadow: "inset 0 1.5px 0 rgba(180,210,255,0.4), 0 4px 16px rgba(79,142,247,0.32)",
-            }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="white" stroke="rgba(255,255,255,0.55)" strokeWidth="0.5"/>
-              </svg>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.42)", letterSpacing: 0.3 }}>Баланс TRND</div>
-                <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, background: "linear-gradient(135deg, #ffe566, #f5a623)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>40</div>
-              </div>
-              <button style={{ ...liquidGlassBtn, width: 32, height: 32, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <GlassShine />
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.3 }}>Миша Зевс</span>
-                <span style={{
-                  display: "flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 600,
-                  background: "linear-gradient(135deg, rgba(212,175,55,0.3), rgba(192,140,30,0.15))",
-                  color: "#f0c96a", border: "1px solid rgba(240,201,106,0.35)",
-                  backdropFilter: "blur(8px)", boxShadow: "inset 0 1px 0 rgba(255,230,120,0.25)",
-                }}>
-                  🥈 SILVER
-                </span>
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.42)" }}>@misha_zeus</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.32)" }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                с 10 июня 2026 г.
-              </div>
-            </div>
-            <div style={{
-              width: 56, height: 56, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 16, fontWeight: 700, color: "#a8d0ff",
-              background: "linear-gradient(135deg, rgba(79,142,247,0.38), rgba(30,60,140,0.28))",
-              border: "2px solid rgba(100,160,255,0.42)",
-              boxShadow: "0 0 22px rgba(79,142,247,0.18), inset 0 1.5px 0 rgba(180,210,255,0.3)",
-              backdropFilter: "blur(12px)",
-            }}>МЗ</div>
-          </div>
-        </div>
-
-        {/* Tab Nav */}
-        <div style={{
-          margin: "0 16px 12px", padding: 4, borderRadius: 20, display: "flex", gap: 2,
-          background: "rgba(0,0,0,0.28)", backdropFilter: "blur(24px)",
-          border: "1px solid rgba(255,255,255,0.1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
-        }}>
-          {([
-            { id: "channels", label: "Каналы", icon: "📡" },
-            { id: "tokens",   label: "Токены",  icon: "🪙" },
-            { id: "shop",     label: "Магазин", icon: "🛍" },
-            { id: "tasks",    label: "Задания", icon: "✅" },
-          ] as const).map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={active ? {
-                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                  padding: "7px 0", borderRadius: 16, cursor: "pointer",
-                  background: "linear-gradient(145deg, rgba(79,142,247,0.42), rgba(45,110,245,0.22))",
-                  backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-                  color: "#8ecfff", border: "1px solid rgba(110,175,255,0.35)",
-                  boxShadow: "inset 0 1.5px 0 rgba(190,225,255,0.32), 0 2px 14px rgba(79,142,247,0.22)",
-                  fontSize: 11, fontWeight: 600, position: "relative", overflow: "hidden",
-                } : {
-                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                  padding: "7px 0", borderRadius: 16, cursor: "pointer",
-                  background: "transparent", color: "rgba(255,255,255,0.35)",
-                  border: "1px solid transparent", fontSize: 11, fontWeight: 400,
-                }}
-              >
-                {active && <GlassShine />}
-                <span style={{ fontSize: 17 }}>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Scrollable Content */}
-        <div style={{ flex: 1, margin: "0 16px", paddingBottom: 24, overflowY: "auto", maxHeight: "calc(100vh - 308px)" }}>
-
-          {/* ── CHANNELS ── */}
-          {activeTab === "channels" && (
-            <div>
-              <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-                {[
-                  { label: "Мой канал", initials: "МО", active: true },
-                  { label: "Ещё канал", initials: "+", active: false },
-                ].map((ch) => (
-                  <div key={ch.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                    <div style={ch.active ? {
-                      width: 56, height: 56, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 14, fontWeight: 700, color: "#fff",
-                      background: "linear-gradient(135deg, rgba(79,142,247,0.58), rgba(45,110,245,0.38))",
-                      border: "2px solid rgba(120,170,255,0.5)",
-                      boxShadow: "0 0 20px rgba(79,142,247,0.28), inset 0 1.5px 0 rgba(180,210,255,0.42)",
-                      backdropFilter: "blur(12px)",
-                    } : {
-                      width: 56, height: 56, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "rgba(255,255,255,0.05)", border: "2px dashed rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.38)",
-                      backdropFilter: "blur(8px)", cursor: "pointer",
-                    }}>
-                      {ch.initials === "+" ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg> : ch.initials}
-                    </div>
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.42)" }}>{ch.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ ...glassCard, borderRadius: 24, padding: 16, marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <span style={{ fontSize: 16, fontWeight: 700 }}>Мой канал</span>
-                  <span style={{
-                    display: "flex", alignItems: "center", gap: 4, fontSize: 11, padding: "4px 10px", borderRadius: 999, fontWeight: 600,
-                    background: "linear-gradient(135deg, rgba(52,199,89,0.28), rgba(30,160,60,0.14))",
-                    color: "#4ddb7a", border: "1px solid rgba(52,199,89,0.33)",
-                    backdropFilter: "blur(8px)", boxShadow: "inset 0 1px 0 rgba(100,255,140,0.18)",
-                  }}>✓ Одобрен</span>
-                </div>
-
-                <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                  {[
-                    { label: "Trends", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>, style: { ...liquidGlassBtnBlue, color: "#b0d8ff" } },
-                    { label: "Редактировать", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>, style: { ...liquidGlassBtn, color: "rgba(255,255,255,0.7)" } },
-                  ].map((btn) => (
-                    <button key={btn.label} style={{ ...btn.style, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "10px 0", borderRadius: 18, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                      <GlassShine />{btn.icon}{btn.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6, marginBottom: 16 }}>
-                  {["Видео","Просм.","Лайки","Перех.","Подп."].map((s) => (
-                    <div key={s} style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 0", borderRadius: 16,
-                      background: "rgba(255,255,255,0.06)", backdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-                    }}>
-                      <span style={{ fontSize: 16, fontWeight: 800 }}>0</span>
-                      <span style={{ fontSize: 9, color: "rgba(255,255,255,0.36)", textAlign: "center", lineHeight: 1.2 }}>{s}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "14px", borderRadius: 18, marginBottom: 12,
-                  background: "linear-gradient(135deg, rgba(247,201,72,0.1), rgba(245,166,35,0.05))",
-                  backdropFilter: "blur(12px)", border: "1px solid rgba(247,201,72,0.2)",
-                  boxShadow: "inset 0 1px 0 rgba(255,230,100,0.1)",
-                }}>
-                  <div>
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.38)", letterSpacing: 0.8, marginBottom: 2 }}>НАГРАДЫ ПОДПИСЧИКАМ</div>
-                    <div style={{ fontSize: 20, fontWeight: 900, background: "linear-gradient(90deg, #ffe566, #f5a623)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>0 <span style={{ fontSize: 12, fontWeight: 600 }}>TRND</span></div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.26)" }}>Пополни баланс</div>
-                  </div>
-                  <button style={{ ...liquidGlassBtnGold, display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 14, fontSize: 13, fontWeight: 700, color: "#2a1400", cursor: "pointer" }}>
-                    <GlassShine />⭐ Пополнить
-                  </button>
-                </div>
-
-                <div style={{ padding: 12, borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", fontSize: 11, color: "rgba(255,255,255,0.35)", lineHeight: 1.7, backdropFilter: "blur(8px)" }}>
-                  💡 Купи Stars → они станут TRND → выбери видео → установи награду
-                </div>
-              </div>
-
-              <button style={{ ...liquidGlassBtnBlue, width: "100%", padding: "14px 0", borderRadius: 20, fontSize: 14, fontWeight: 700, color: "#d0eaff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 28px rgba(79,142,247,0.42), inset 0 1.5px 0 rgba(200,225,255,0.52)" }}>
-                <GlassShine />
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                Добавить видео в ленту
-              </button>
-
-              <div style={{ display: "flex", gap: 8 }}>
-                {[{ label: "Опубликовано", active: true }, { label: "На проверке", active: false }].map((t) => (
-                  <button key={t.label} style={t.active ? { ...liquidGlassBtn, flex: 1, padding: "10px 0", borderRadius: 16, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer" } : { flex: 1, padding: "10px 0", borderRadius: 16, fontSize: 13, color: "rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}>
-                    {t.active && <GlassShine />}{t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── TOKENS ── */}
-          {activeTab === "tokens" && (
-            <div>
-              <div style={{ textAlign: "center", marginBottom: 20 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 4 }}>
-                  <span style={{ fontSize: 58, fontWeight: 900, background: "linear-gradient(135deg, #ffe566, #f5a623)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 22px rgba(247,201,72,0.45))" }}>40</span>
-                  <div style={{ ...liquidGlassBtnGold, width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#2a1400" }}>
-                    <GlassShine />T
-                  </div>
-                </div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.52)", marginBottom: 6 }}>TRND</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.32)", maxWidth: 260, margin: "0 auto", lineHeight: 1.6 }}>Trends начисляет TRND за просмотры, стрики и приглашения друзей</div>
-              </div>
-
-              <div style={{ ...glassCard, borderRadius: 24, padding: 16, marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>Пригласить друга</div>
-                    <div style={{ fontSize: 12, color: "#7ec0ff" }}>+13 000 T вам и другу</div>
-                  </div>
-                  <div style={{ ...liquidGlassBtnBlue, display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 12, color: "#b0d8ff", fontSize: 14, fontWeight: 700 }}>
-                    <GlassShine />
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    0
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 16, marginBottom: 12, background: "rgba(0,0,0,0.22)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <span style={{ flex: 1, fontSize: 11, color: "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>t.me/ContentifyAI_Bot?startapp=ref_288…</span>
-                  {[
-                    <svg key="c" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7ec0ff" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-                    <svg key="s" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7ec0ff" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
-                  ].map((icon, i) => (
-                    <button key={i} style={{ ...liquidGlassBtnBlue, padding: 6, borderRadius: 10, cursor: "pointer" }}><GlassShine />{icon}</button>
-                  ))}
-                </div>
-
-                <button style={{ ...liquidGlassBtnBlue, width: "100%", padding: "12px 0", borderRadius: 18, fontSize: 13, fontWeight: 700, color: "#d0eaff", cursor: "pointer", boxShadow: "0 6px 24px rgba(79,142,247,0.38), inset 0 1.5px 0 rgba(200,225,255,0.52)" }}>
-                  <GlassShine />Поделиться ссылкой
-                </button>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                {[{ id: "activity", label: "Активность" }, { id: "friends", label: "Друзья" }, { id: "badges", label: "Бейджи" }].map((t) => (
-                  <button key={t.id} onClick={() => setTokenTab(t.id)} style={tokenTab === t.id ? { ...liquidGlassBtn, flex: 1, padding: "8px 0", borderRadius: 14, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer" } : { flex: 1, padding: "8px 0", borderRadius: 14, fontSize: 13, color: "rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}>
-                    {tokenTab === t.id && <GlassShine />}{t.label}
-                  </button>
-                ))}
-              </div>
-
-              {tokenTab === "activity" && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.28)", letterSpacing: 1, marginBottom: 10 }}>КАК ЗАРАБАТЫВАТЬ</div>
-                  {[
-                    { icon: "👁", label: "Просмотр видео",    sub: "25–100 Coins / видео", reward: "25–100 С" },
-                    { icon: "🔥", label: "Ежедневный чекин",  sub: "50–500 Coins, 30-дневный цикл", reward: "50–500 С" },
-                    { icon: "👥", label: "Приглашение друга", sub: "13000 Coins за каждого", reward: "13 000 С" },
-                  ].map((item) => (
-                    <div key={item.label} style={{ ...glassCard, borderRadius: 18, padding: "12px 14px", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>{item.icon}</div>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600 }}>{item.label}</div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.36)" }}>{item.sub}</div>
-                        </div>
-                      </div>
-                      <span style={{ fontSize: 13, fontWeight: 800, background: "linear-gradient(135deg, #ffe566, #f5a623)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{item.reward}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── SHOP ── */}
-          {activeTab === "shop" && (
-            <div>
-              <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto", paddingBottom: 4 }}>
-                {["Бонусы","Партнеры","Розыгрыш","Boost"].map((t) => (
-                  <button key={t} onClick={() => setShopTab(t.toLowerCase())} style={shopTab === t.toLowerCase() ? { ...liquidGlassBtn, flexShrink: 0, padding: "8px 16px", borderRadius: 14, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer", whiteSpace: "nowrap" } : { flexShrink: 0, padding: "8px 16px", borderRadius: 14, fontSize: 13, color: "rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", whiteSpace: "nowrap" }}>
-                    {shopTab === t.toLowerCase() && <GlassShine />}{t}
-                  </button>
-                ))}
-              </div>
-              <div style={{ ...glassCard, borderRadius: 24, padding: "28px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🛍</div>
-                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Офферы загружаются</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.36)", lineHeight: 1.7 }}>Скоро здесь появятся подписки, сервисы и гифт-карты от партнёров — обменивай токены на выгоду</div>
-              </div>
-            </div>
-          )}
-
-          {/* ── TASKS ── */}
-          {activeTab === "tasks" && (
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.28)", letterSpacing: 1, marginBottom: 10 }}>КВЕСТЫ ДНЯ · 10 ИЮНЯ</div>
-
-              <div style={{ ...glassCard, borderRadius: 22, padding: 16, marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>Бонус за все 4 квеста</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.36)" }}>Выполнено 0/4</div>
-                </div>
-                <span style={{ padding: "6px 12px", borderRadius: 12, fontSize: 13, fontWeight: 700, background: "linear-gradient(135deg, rgba(247,201,72,0.24), rgba(245,166,35,0.12))", color: "#f7c948", border: "1px solid rgba(247,201,72,0.28)", backdropFilter: "blur(8px)", boxShadow: "inset 0 1px 0 rgba(255,230,100,0.18)" }}>+150 TRND</span>
-              </div>
-
-              {[
-                { label: "Посмотри 20 видео",        sub: "Любых видео в ленте", reward: "+30", progress: 20, total: 20, done: true  },
-                { label: "Зацени 3 разные категории", sub: "Расширь интересы",   reward: "+30", progress: 0,  total: 3,  done: false },
-                { label: "Посмотри 50 видео",         sub: "Залипни на ленте",   reward: "+60", progress: 46, total: 50, done: false },
-              ].map((q) => (
-                <div key={q.label} style={{ ...glassCard, borderRadius: 22, padding: 16, marginBottom: 10, border: q.done ? "1px solid rgba(247,201,72,0.22)" : "1px solid rgba(255,255,255,0.1)" }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700 }}>{q.label}</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.38)" }}>{q.sub}</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, background: "linear-gradient(135deg, #ffe566, #f5a623)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{q.reward}</div>
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.32)" }}>TRND</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.32)" }}>Прогресс</span>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.52)" }}>{q.progress} / {q.total}</span>
-                  </div>
-
-                  <div style={{ width: "100%", height: 6, borderRadius: 999, background: "rgba(255,255,255,0.08)", marginBottom: 12, overflow: "hidden" }}>
-                    <div style={{
-                      height: "100%", borderRadius: 999,
-                      width: `${(q.progress / q.total) * 100}%`,
-                      background: q.done ? "linear-gradient(90deg, #ffe566, #f5a623)" : "linear-gradient(90deg, #4f8ef7, #2d6ef5)",
-                      boxShadow: q.done ? "0 0 8px rgba(247,201,72,0.55)" : "0 0 8px rgba(79,142,247,0.45)",
-                    }} />
-                  </div>
-
-                  {q.done ? (
-                    <button style={{ ...liquidGlassBtnGold, width: "100%", padding: "11px 0", borderRadius: 16, fontSize: 13, fontWeight: 700, color: "#2a1400", cursor: "pointer", boxShadow: "0 4px 22px rgba(247,201,72,0.38), inset 0 1.5px 0 rgba(255,245,160,0.65)" }}>
-                      <GlassShine />Получить награду
-                    </button>
-                  ) : (
-                    <div style={{ width: "100%", padding: "11px 0", borderRadius: 16, fontSize: 13, color: "rgba(255,255,255,0.22)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
-                      Прогресс...
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+      <div style={{ position:"relative", zIndex:1 }}>
+        <Header />
+        <div style={{ overflowY:"auto", maxHeight:"calc(100vh - 248px)" }}>
+          {activeTab === "channels" && (hasChannel ? <ChannelsWithChannel /> : <ChannelsEmpty />)}
+          {activeTab === "tokens"   && <Tokens />}
+          {activeTab === "shop"     && <Shop />}
+          {activeTab === "tasks"    && <Tasks />}
         </div>
       </div>
     </div>
