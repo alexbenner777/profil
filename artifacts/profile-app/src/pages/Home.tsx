@@ -305,7 +305,7 @@ export default function Home() {
                   /* ── Channel detail card ── */
                   <div className="space-y-0 pb-28">
                     <div
-                      className="rounded-2xl p-4 space-y-4"
+                      className="rounded-2xl p-4 space-y-2.5"
                       style={{
                         background: "linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.07) 100%)",
                         border: "1px solid rgba(255,255,255,0.14)",
