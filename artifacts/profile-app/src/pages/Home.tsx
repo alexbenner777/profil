@@ -63,7 +63,7 @@ const TabBar = ({
       <button
         key={tab}
         onClick={() => setActive(tab)}
-        className={`flex-1 text-center py-[7px] text-[13px] font-semibold rounded-xl transition-all duration-200 ${
+        className={`flex-1 text-center py-[7px] text-[13px] font-semibold rounded-lg transition-all duration-200 ${
           active === tab
             ? "bg-white text-black shadow-sm"
             : "text-white/55 hover:text-white/80"
