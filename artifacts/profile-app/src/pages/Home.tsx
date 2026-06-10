@@ -58,7 +58,7 @@ const TabBar = ({
   active: string;
   setActive: (t: string) => void;
 }) => (
-  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)" }}>
+  <div className="flex items-center rounded-full p-[3px] w-full" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 100%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)" }}>
     {tabs.map((tab) => (
       <button
         key={tab}
@@ -137,14 +137,14 @@ export default function Home() {
             <div
               className="flex items-center flex-1"
               style={{
-                background: "rgba(255,255,255,0.09)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
                 border: "1px solid rgba(255,255,255,0.14)",
                 borderRadius: 18,
                 backdropFilter: "blur(12px)",
                 padding: "8px 14px 8px 8px",
                 gap: 10,
                 minHeight: 62,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
               }}
             >
               <TrendsLogo />
@@ -164,14 +164,14 @@ export default function Home() {
                 width: 62,
                 height: 62,
                 borderRadius: 18,
-                background: "rgba(255,255,255,0.09)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
                 border: "1px solid rgba(255,255,255,0.14)",
                 backdropFilter: "blur(12px)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
               }}
             >
               <Settings style={{ width: 20, height: 20, color: "rgba(255,255,255,0.55)" }} />
@@ -287,10 +287,10 @@ export default function Home() {
                       onClick={() => setHasChannel(true)}
                       className="w-[56px] h-[56px] rounded-full flex items-center justify-center transition-colors active:scale-95"
                       style={{
-                        background: "rgba(255,255,255,0.09)",
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.09) 100%)",
                         border: "1px solid rgba(255,255,255,0.14)",
                         backdropFilter: "blur(12px)",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1.5px 0 rgba(255,255,255,0.32)",
                       }}
                     >
                       <Plus className="w-5 h-5 text-white/55" />
